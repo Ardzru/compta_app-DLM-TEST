@@ -1,0 +1,16 @@
+# Environnements
+venv/
+__pycache__/
+*.pyc
+
+# Données runtime
+fichiers_brut/*
+archive/*
+sortie/*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

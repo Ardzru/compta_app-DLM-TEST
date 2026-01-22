@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — Import comptable</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1621; --text:#e7edf5; --muted:#9fb0c3;
+      --ok:#22c55e; --warn:#f59e0b; --err:#ef4444; --line:#1f2a3a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg); color:var(--text);
+    }
+    main{max-width:1100px; margin:0 auto; padding:24px}
+    header{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:16px}
+    h1{font-size:18px; margin:0}
+    .muted{color:var(--muted)}
+    .row{display:flex; gap:12px; flex-wrap:wrap; margin:12px 0 18px}
+    .card{
+      background:var(--panel); border:1px solid var(--line); border-radius:10px;
+      padding:12px 14px; min-width:210px; flex:1;
+    }
+    .k{font-size:12px; color:var(--muted); margin-bottom:6px}
+    .v{font-size:20px; font-weight:700}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:4px 10px; border-radius:999px; border:1px solid var(--line);
+      background:rgba(255,255,255,0.03); color:var(--text); font-size:12px; white-space:nowrap;
+    }
+    .dot{width:8px; height:8px; border-radius:50%}
+    .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.err{background:var(--err)}
+    table{
+      width:100%; border-collapse:separate; border-spacing:0; overflow:hidden;
+      border:1px solid var(--line); border-radius:10px; background:var(--panel);
+    }
+    thead th{
+      text-align:left; font-size:12px; color:var(--muted); font-weight:600;
+      padding:10px 12px; border-bottom:1px solid var(--line);
+    }
+    tbody td{
+      padding:10px 12px; border-bottom:1px solid rgba(31,42,58,0.7); vertical-align:top;
+    }
+    tbody tr:last-child td{border-bottom:none}
+    .right{text-align:right}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .section{margin-top:16px}
+    .errors{
+      background:rgba(239,68,68,0.08);
+      border:1px solid rgba(239,68,68,0.25);
+      padding:12px 14px; border-radius:10px;
+    }
+    .errors h2{font-size:14px; margin:0 0 10px}
+    .errors ul{margin:0; padding-left:18px}
+    .topbar{display:flex; gap:10px; align-items:center}
+    button{
+      background:rgba(255,255,255,0.06); color:var(--text);
+      border:1px solid var(--line); border-radius:10px; padding:8px 10px;
+      cursor:pointer;
+    }
+    button:hover{background:rgba(255,255,255,0.10)}
+    .small{font-size:12px}
+    a{color:inherit}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Dashboard — Import comptable</h1>
+      <div class="muted small" id="subtitle">Chargement…</div>
+    </div>
+    <div class="topbar">
+      <span class="badge" id="statusBadge">
+        <span class="dot warn"></span><span id="statusText">En attente</span>
+      </span>
+      <button id="refreshBtn" type="button">Rafraîchir</button>
+    </div>
+  </header>
+
+  <div class="row">
+    <div class="card">
+      <div class="k">Fichiers déposés</div>
+      <div class="v" id="k_total">—</div>
+    </div>
+    <div class="card">
+      <div class="k">Traités</div>
+      <div class="v" id="k_ok">—</div>
+    </div>
+    <div class="card">
+      <div class="k">Ignorés</div>
+      <div class="v" id="k_ignored">—</div>
+    </div>
+    <div class="card">
+      <div class="k">Erreurs</div>
+      <div class="v" id="k_err">—</div>
+    </div>
+  </div>
+
+  <table aria-label="Tableau des fichiers">
+    <thead>
+      <tr>
+        <th>Fichier</th>
+        <th>Type détecté</th>
+        <th>Statut</th>
+        <th>Sortie</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      <tr><td colspan="4" class="muted">Chargement…</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section" id="errorsSection" style="display:none;">
+    <div class="errors">
+      <h2>Erreurs</h2>
+      <ul id="errorsList"></ul>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Attendu côté API: GET /api/dashboard
+  // Format tolérant: on essaye de s’adapter.
+  //
+  // Formats supportés par ce HTML:
+  // 1) { summary:{total,success,ignored,errors}, files:[{name,type,status,output,message}], errors:[...] }
+  // 2) { success, errors, ignored, files:[...]} etc.
+  // 3) { items:[...]} etc.
+  //
+  // Statuts reconnus: "success|ok", "ignored|skip", "error|failed" (insensible à la casse)
+  const $ = (id)=>document.getElementById(id);
+
+  function normStatus(s){
+    const v = (s||"").toString().trim().toLowerCase();
+    if(["success","ok","treated","traite","traité"].includes(v)) return "ok";
+    if(["ignored","ignore","ignored_file","skip","skipped","non reconnu","non_reconnu"].includes(v)) return "ignored";
+    if(["error","erreur","failed","fail","ko"].includes(v)) return "error";
+    return v || "unknown";
+  }
+
+  function statusBadge(status){
+    const s = normStatus(status);
+    if(s==="ok") return {label:"Traité", dot:"ok"};
+    if(s==="ignored") return {label:"Ignoré", dot:"warn"};
+    if(s==="error") return {label:"Erreur", dot:"err"};
+    return {label:"Inconnu", dot:"warn"};
+  }
+
+  function escapeHtml(str){
+    return (str??"").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function inferFiles(payload){
+    return payload.files || payload.items || payload.resultats || payload.results || [];
+  }
+
+  function inferSummary(payload, files){
+    const s = payload.summary || payload.resume || {};
+    const total = s.total ?? s.fichiers ?? payload.total ?? files.length ?? 0;
+
+    const countBy = (wanted)=>files.filter(f=>{
+      const st = normStatus(f.status || f.statut || f.state);
+      return st === wanted;
+    }).length;
+
+    const ok = s.success ?? s.ok ?? s.traites ?? payload.success ?? payload.ok ?? countBy("ok");
+    const ignored = s.ignored ?? s.ignores ?? payload.ignored ?? payload.ignores ?? countBy("ignored");
+    const err = s.errors ?? s.erreurs ?? payload.errors ?? payload.erreurs ?? countBy("error");
+
+    return { total, ok, ignored, err };
+  }
+
+  function inferErrors(payload, files){
+    if(Array.isArray(payload.errors)) return payload.errors;
+    if(Array.isArray(payload.erreurs)) return payload.erreurs;
+
+    // Sinon: on récupère les messages des fichiers en erreur
+    const errs = [];
+    for(const f of files){
+      const st = normStatus(f.status || f.statut || f.state);
+      if(st==="error"){
+        const name = f.name || f.fichier || f.filename || "Fichier";
+        const msg = f.message || f.erreur || f.error || "";
+        errs.push(msg ? `${name} : ${msg}` : name);
+      }
+    }
+    return errs;
+  }
+
+  function render(payload){
+    const files = inferFiles(payload);
+
+    const summary = inferSummary(payload, files);
+    $("k_total").textContent = summary.total;
+    $("k_ok").textContent = summary.ok;
+    $("k_ignored").textContent = summary.ignored;
+    $("k_err").textContent = summary.err;
+
+    const now = new Date();
+    $("subtitle").textContent = `Dernière mise à jour : ${now.toLocaleString("fr-FR")}`;
+
+    // Badge global
+    const global =
+      summary.err > 0 ? {label:"Erreurs détectées", dot:"err"} :
+      summary.ignored > 0 ? {label:"Traitement partiel", dot:"warn"} :
+      {label:"OK", dot:"ok"};
+
+    $("statusText").textContent = global.label;
+    const dot = $("statusBadge").querySelector(".dot");
+    dot.className = "dot " + global.dot;
+
+    // Table
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+
+    if(!files.length){
+      tbody.innerHTML = `<tr><td colspan="4" class="muted">Aucun fichier.</td></tr>`;
+    } else {
+      for(const f of files){
+        const name = f.name || f.fichier || f.filename || "";
+        const type = f.type || f.detected_type || f.detecte || f.detection || "—";
+        const rawStatus = f.status || f.statut || f.state || "unknown";
+        const out = f.output || f.sortie || f.generated || f.csv || "—";
+        const msg = f.message || f.info || f.erreur || f.error || "";
+
+        const b = statusBadge(rawStatus);
+
+        const statusHtml = `
+          <span class="badge" title="${escapeHtml(msg)}">
+            <span class="dot ${b.dot}"></span>${escapeHtml(b.label)}
+          </span>
+        `;
+
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td class="mono">${escapeHtml(name)}</td>
+            <td>${escapeHtml(type)}</td>
+            <td>${statusHtml}</td>
+            <td class="mono">${escapeHtml(out)}</td>
+          </tr>
+        `);
+      }
+    }
+
+    // Errors section
+    const errors = inferErrors(payload, files);
+    const sec = $("errorsSection");
+    const list = $("errorsList");
+    list.innerHTML = "";
+
+    if(errors && errors.length){
+      sec.style.display = "";
+      for(const e of errors){
+        list.insertAdjacentHTML("beforeend", `<li>${escapeHtml(e)}</li>`);
+      }
+    } else {
+      sec.style.display = "none";
+    }
+  }
+
+  async function load(){
+    $("tbody").innerHTML = `<tr><td colspan="4" class="muted">Chargement…</td></tr>`;
+    try{
+      const res = await fetch("/api/dashboard", {cache:"no-store"});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const payload = await res.json();
+      render(payload);
+    } catch(e){
+      $("subtitle").textContent = "Impossible de charger /api/dashboard";
+      $("statusText").textContent = "API indisponible";
+      const dot = $("statusBadge").querySelector(".dot");
+      dot.className = "dot err";
+
+      $("tbody").innerHTML = `
+        <tr>
+          <td colspan="4" class="muted">
+            Erreur de chargement. Vérifie que le serveur tourne et que <span class="mono">/api/dashboard</span> répond.
+          </td>
+        </tr>`;
+      $("errorsSection").style.display = "";
+      $("errorsList").innerHTML = `<li>${escapeHtml(e.message || e.toString())}</li>`;
+    }
+  }
+
+  $("refreshBtn").addEventListener("click", load);
+  load();
+</script>
+</body>
+</html>
