@@ -1,41 +1,100 @@
+import sys
+import logging
+import tkinter as tk
 from pathlib import Path
-from core.dispatcher import traiter_fichier
-from logger import logger
+from tkinter import messagebox
 
-from config import DOSSIER_BRUT
-DOSSIER_FICHIERS = DOSSIER_BRUT
+# ── Répertoire de base ────────────────────────────────────────────────────────
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys.executable).parent
+else:
+    BASE_DIR = Path(__file__).resolve().parent
 
+log_file = BASE_DIR / "compta_app.log"
 
-def lancer_traitement():
-    succes = 0
-    erreurs = 0
+# ── Logger ────────────────────────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(name)s : %(message)s",
+    handlers=[
+        logging.FileHandler(log_file, encoding="utf-8"),
+        logging.StreamHandler(sys.stdout),
+    ],
+)
+_log = logging.getLogger("app")
 
-    logger.info("=== DÉBUT DU TRAITEMENT ===")
+def show_fatal_error(msg: str):
+    """Affiche une popup d'erreur ET écrit dans le log."""
+    _log.critical(msg)
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        messagebox.showerror("Erreur fatale – ComptaApp", msg)
+        root.destroy()
+    except Exception:
+        pass
 
-    if not DOSSIER_FICHIERS.exists():
-        logger.error(f"Dossier introuvable : {DOSSIER_FICHIERS}")
-        print("Dossier fichiers_brut introuvable")
-        return
+# ── Démarrage ─────────────────────────────────────────────────────────────────
+_log.debug("=" * 60)
+_log.debug("=== DÉMARRAGE app.py ===")
+_log.debug(f"Python     : {sys.version}")
+_log.debug(f"Executable : {sys.executable}")
+_log.debug(f"Frozen     : {getattr(sys, 'frozen', False)}")
+_log.debug(f"BASE_DIR   : {BASE_DIR}")
+_log.debug(f"Log file   : {log_file}")
 
-    for fichier in DOSSIER_FICHIERS.iterdir():
-        if not fichier.is_file():
-            continue
+# ── Imports projet ────────────────────────────────────────────────────────────
+_log.debug("Import config...")
+try:
+    from config import DOSSIER_BRUT, DOSSIER_SORTIE
+    _log.debug(f"DOSSIER_BRUT   = {DOSSIER_BRUT}")
+    _log.debug(f"DOSSIER_SORTIE = {DOSSIER_SORTIE}")
+except Exception as e:
+    show_fatal_error(f"Echec import config :\n{e}")
+    sys.exit(1)
 
-        try:
-            traiter_fichier(fichier)
-            succes += 1
-        except Exception:
-            erreurs += 1
+_log.debug("Import logger...")
+try:
+    from logger import logger
+    _log.debug("logger OK")
+except Exception as e:
+    show_fatal_error(f"Echec import logger :\n{e}")
+    sys.exit(1)
 
-    logger.info("=== FIN DU TRAITEMENT ===")
-    logger.info(f"Succès : {succes}")
-    logger.info(f"Erreurs : {erreurs}")
+_log.debug("Import dispatcher...")
+try:
+    from core.dispatcher import traiter_fichier
+    _log.debug("dispatcher OK")
+except Exception as e:
+    show_fatal_error(f"Echec import dispatcher :\n{e}")
+    sys.exit(1)
 
-    print("Traitement terminé")
-    print(f"Succès : {succes}")
-    print(f"Erreurs : {erreurs}")
-    print("Voir traitement.log pour le détail")
+_log.debug("Import MainWindow...")
+try:
+    from ui.main_window import MainWindow
+    _log.debug("MainWindow OK")
+except Exception as e:
+    show_fatal_error(f"Echec import MainWindow :\n{e}")
+    sys.exit(1)
 
+_log.debug("Tous les imports OK")
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+def main():
+    _log.debug("main() appelé")
+    try:
+        root = tk.Tk()
+        _log.debug("Tk() créé")
+        app = MainWindow(root)
+        _log.debug("Lancement mainloop")
+        root.mainloop()
+        _log.debug("mainloop terminée proprement")
+    except Exception as e:
+        _log.critical(f"Erreur fatale dans main() : {e}", exc_info=True)
+        show_fatal_error(
+            f"L'application a planté :\n{e}\n\nVoir le log :\n{log_file}"
+        )
+        sys.exit(1)
 
 if __name__ == "__main__":
-    lancer_traitement()
+    main()
