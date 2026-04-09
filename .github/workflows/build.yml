@@ -26,13 +26,9 @@ jobs:
       - name: Build EXE
         run: |
           pyinstaller --onefile --name ComptaApp `
-            --hidden-import pandas `
-            --hidden-import pandas._libs.tslibs.np_datetime `
-            --hidden-import pandas._libs.tslibs.nattype `
-            --hidden-import pandas._libs.tslibs.timedeltas `
-            --hidden-import pandas._libs.skiplist `
-            --hidden-import openpyxl `
-            --hidden-import chardet `
+            --collect-all pandas `
+            --collect-all openpyxl `
+            --collect-all chardet `
             --hidden-import ui `
             --hidden-import ui.main_window `
             --hidden-import core `
