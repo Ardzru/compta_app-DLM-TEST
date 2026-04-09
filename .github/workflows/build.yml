@@ -25,7 +25,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --noconsole --name ComptaApp `
+          pyinstaller --onedir --noconsole --name ComptaApp `
             --hidden-import ui `
             --hidden-import ui.main_window `
             --hidden-import core `
@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ComptaApp-exe
-          path: dist/ComptaApp.exe
+          path: dist/ComptaApp/
