@@ -1,7 +1,9 @@
 import logging
 from pathlib import Path
 
-LOG_FILE = Path("traitement.log")
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
+LOG_FILE = BASE_DIR / "traitement.log"
 
 logging.basicConfig(
     filename=LOG_FILE,

@@ -10,7 +10,10 @@ DOSSIER_BRUT = BASE_DIR / "fichiers_brut"
 DOSSIER_BACKUP = BASE_DIR / "backup"
 
 # Dossier de sortie (CSV compta)
-DOSSIER_SORTIE = Path("sorties") / "fichiers_compta"
+DOSSIER_SORTIE = BASE_DIR / "sorties" / "fichiers_compta"
+
+# Fichier de correspondance AMEX
+FICHIER_CORRESPONDANCE_AMEX = BASE_DIR / "correspondance_amex.csv"
 
 # Création des dossiers si besoin
 DOSSIER_BRUT.mkdir(exist_ok=True)

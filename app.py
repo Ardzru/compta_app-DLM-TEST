@@ -1,8 +1,9 @@
 from pathlib import Path
-from dispatcher import traiter_fichier
+from core.dispatcher import traiter_fichier
 from logger import logger
 
-DOSSIER_FICHIERS = Path("fichiers_brut")
+from config import DOSSIER_BRUT
+DOSSIER_FICHIERS = DOSSIER_BRUT
 
 
 def lancer_traitement():

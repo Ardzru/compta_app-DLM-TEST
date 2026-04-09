@@ -1,7 +1,15 @@
 from pathlib import Path
 import traceback
 
-from core.detecteur import *
+from core.detecteur import (
+    est_amex_caisse,
+    est_amex_internet,
+    est_avoirs,
+    est_alma,
+    est_ancv,
+    est_kiosk_photo,
+    est_ta,
+)
 
 from handlers.traiter_ancv import traiter_ancv
 from handlers.traiter_alma import traiter_alma
@@ -31,30 +39,42 @@ def traiter_fichier(fichier: Path) -> bool:
             fichier_traitement = convertir_xls_en_xlsx(fichier)
 
         # ==========================================================
-        # 🔍 DÉTECTIONS PRIORITAIRES (ORDRE IMPORTANT)
+        # 🔍 DÉTECTIONS - lecture unique par fichier
         # ==========================================================
 
-        if est_amex_caisse(fichier):
+        detected_amex_caisse   = est_amex_caisse(fichier_traitement)
+        detected_amex_internet = est_amex_internet(fichier_traitement)
+        detected_avoirs        = est_avoirs(fichier_traitement)
+        detected_alma          = est_alma(fichier_traitement)
+        detected_ancv          = est_ancv(fichier)          # CSV → pas de conversion
+        detected_kiosk         = est_kiosk_photo(fichier)   # Détection par nom uniquement
+        detected_ta            = est_ta(fichier_traitement)
+
+        # ==========================================================
+        # ⚙️ TRAITEMENTS (ORDRE IMPORTANT)
+        # ==========================================================
+
+        if detected_amex_caisse:
             logger.info(f"AMEX CAISSE détecté : {fichier.name}")
             traiter_amex_caisse(fichier_traitement)
             traite = True
 
-        if est_amex_internet(fichier):
+        if detected_amex_internet:
             logger.info(f"AMEX INTERNET détecté : {fichier.name}")
             traiter_amex_internet(fichier_traitement)
             traite = True
 
-        if est_avoirs(fichier):
+        if detected_avoirs:
             logger.info(f"AVOIRS détecté : {fichier.name}")
             traiter_avoirs(fichier_traitement)
             traite = True
 
-        if est_alma(fichier):
+        if detected_alma:
             logger.info(f"ALMA détecté : {fichier.name}")
             traiter_alma(fichier_traitement)
             traite = True
 
-        if est_ancv(fichier):
+        if detected_ancv:
             logger.info(f"ANCV détecté : {fichier.name}")
             traiter_ancv(fichier_traitement)
             traite = True
@@ -63,7 +83,7 @@ def traiter_fichier(fichier: Path) -> bool:
         # 📸 KIOSK PHOTO LUGE (AVANT BANQUE)
         # ==========================================================
 
-        if est_kiosk_photo(fichier):
+        if detected_kiosk:
             logger.info(f"KIOSK PHOTO LUGE détecté : {fichier.name}")
             traiter_kiosk_photo(fichier_traitement)
             traite = True
@@ -74,7 +94,8 @@ def traiter_fichier(fichier: Path) -> bool:
 
         if (
             fichier.suffix.lower() == ".csv"
-            and not est_ancv(fichier)
+            and not detected_ancv       # ← résultat stocké, pas de 2ème lecture
+            and not detected_kiosk      # ← un fichier kiosk n'est pas un fichier banque
             and not traite
         ):
             try:
@@ -88,7 +109,7 @@ def traiter_fichier(fichier: Path) -> bool:
         # 🎟️ TA
         # ==========================================================
 
-        if est_ta(fichier):
+        if detected_ta:
             logger.info(f"TA détecté : {fichier.name}")
             traiter_ta(fichier_traitement)
             traite = True
