@@ -17,7 +17,7 @@ _log = logging.getLogger("ui.main_window")
 class MainWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("Application Comptable - SERMA")
+        self.root.title("Application Comptable - DLM")
         self.root.geometry("700x600")
         self.root.resizable(False, False)
 
