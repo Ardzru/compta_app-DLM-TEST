@@ -25,7 +25,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --noconsole --name ComptaApp `
+          pyinstaller --onefile --name ComptaApp `
             --hidden-import ui `
             --hidden-import ui.main_window `
             --hidden-import core `
