@@ -25,7 +25,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --name ComptaApp `
+          pyinstaller --onefile --noconsole --name ComptaApp `
             --collect-all pandas `
             --collect-all openpyxl `
             --collect-all chardet `
