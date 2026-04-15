@@ -1,0 +1,1 @@
+& "Z:\Finances\Dossier perso - Matth\Application pour la compta\compta_app - Test\.venv\Scripts\python.exe" "Z:\Finances\Dossier perso - Matth\Application pour la compta\compta_app - Test\app.py"
