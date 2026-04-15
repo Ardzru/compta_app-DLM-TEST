@@ -1,12 +1,27 @@
+# core/detecteur.py
+
 import pandas as pd
 from pathlib import Path
+import logging
 
+logger = logging.getLogger(__name__)
+
+CONTRATS_BANQUE = {
+    "7770571305": "AMEX",
+    "831103222":  "PLANET",
+    "8430996":    "CB",
+}
+
+def _get_engine(fichier: Path) -> str:
+    """Détermine le moteur de lecture Excel."""
+    if fichier.suffix.lower() == ".xls":
+        return "xlrd"
+    return "openpyxl"
 
 # ----------------------------
 # UTILITAIRE INTERNE
 # ----------------------------
 def _get_engine(fichier: Path) -> str:
-    """Retourne le bon engine selon l'extension du fichier"""
     return "openpyxl" if fichier.suffix.lower() == ".xlsx" else "xlrd"
 
 
@@ -18,12 +33,10 @@ def est_amex_caisse(fichier: Path) -> bool:
         fichier = Path(fichier)
         engine = _get_engine(fichier)
         df = pd.read_excel(fichier, header=None, engine=engine)
-        # DLM est en colonne 6 (pas 14)
         signatures = df[6].astype(str).str.strip().str.upper()
         return (signatures == "DLM").any()
     except:
         return False
-
 
 
 # ----------------------------
@@ -52,7 +65,6 @@ def est_alma(fichier: Path) -> bool:
         df = pd.read_excel(fichier, engine=engine)
     except:
         return False
-
     colonnes = [str(c).lower() for c in df.columns]
     mots_cles = ["alma", "commission", "frais", "tva", "installment", "payout"]
     return any(mot in col for col in colonnes for mot in mots_cles)
@@ -78,6 +90,7 @@ def est_ancv(fichier: Path) -> bool:
         return False
     except Exception:
         return False
+
 
 # ----------------------------
 # TA
@@ -120,12 +133,117 @@ def est_avoirs(fichier: Path) -> bool:
 # KIOSK PHOTO LUGE
 # ----------------------------
 def est_kiosk_photo(fichier: Path) -> bool:
-    """
-    Détection uniquement par nom de fichier.
-    Un fichier ANCV ne s'appellera jamais '*_ventes*'
-    donc pas besoin d'appeler est_ancv() ici.
-    """
     return (
         fichier.suffix.lower() == ".csv"
         and "_ventes" in fichier.stem.lower()
     )
+
+# ----------------------------
+# BANQUE INTERNET (AMEX/PLANET/CB)
+# Détection : colonne B contient un numéro de contrat connu
+# ----------------------------
+def est_banque_internet(fichier: Path) -> bool:
+    """
+    Détecte un fichier banque internet via le numéro de contrat
+    présent en colonne B (AMEX / PLANET / CB).
+    Critère visuel : Image 1 (liste de transactions avec colonnes)
+    """
+    if fichier.suffix.lower() not in [".xls", ".xlsx"]:
+        return False
+
+    try:
+        engine = _get_engine(fichier)
+        # Lecture des 200 premières lignes pour la performance
+        df = pd.read_excel(fichier, header=None, engine=engine,
+                          nrows=200, dtype=str)
+
+        # Vérification minimale : au moins 2 colonnes
+        if df.shape[1] < 2:
+            return False
+
+        # Colonnes visibles : [Date, Crédit, Journal, Libellé écriture, Débit, ...]
+        # On vérifie que la colonne B (index 1) contient un numéro de contrat
+        col_b = df[1].astype(str).str.strip()
+        return col_b.isin(CONTRATS_BANQUE.keys()).any()
+
+    except Exception as e:
+        print(f"Erreur détection Banque {fichier.name}: {e}")
+        return False
+
+# ----------------------------
+# ALPILINK
+# Détection : Fichiers nommés "Data.xlsx", "Data(1).xlsx", etc.
+# Critère visuel : Image 2 ou 3 (fichiers avec données clients/commandes)
+# ----------------------------
+def est_alpilink(fichier: Path) -> bool:
+    """
+    Détecte un fichier Alpilink via le nom du fichier.
+    Critère visuel : Fichiers commençant par 'Data' (Image 2 ou 3)
+    """
+    return (
+        fichier.suffix.lower() in [".xls", ".xlsx"]
+        and fichier.stem.lower().startswith("data")
+    )
+
+# ----------------------------
+# COMPTA INTERNET (SAGE)
+# Détection : Fichiers avec colonnes "Libellé écriture" et "Journal"
+# Critère visuel : Image 4 (fichier Sage avec colonnes spécifiques)
+# ----------------------------
+def est_compta_internet(fichier: Path) -> bool:
+    """
+    Détecte si un fichier est un fichier COMPTA Internet.
+    Affiche des logs détaillés pour comprendre pourquoi ça échoue.
+    """
+    try:
+        fichier = Path(fichier)
+        logger.info(f"🔍 Vérification fichier COMPTA: {fichier.name}")
+
+        # 1️⃣ Vérification de l'extension
+        if fichier.suffix.lower() not in [".xls", ".xlsx"]:
+            logger.warning(f"❌ Fichier {fichier.name} n'est pas un Excel (.xls/.xlsx)")
+            return False
+
+        # 2️⃣ Vérification du nom de fichier (optionnel mais utile)
+        nom_fichier = fichier.name.lower()
+        if "pmt internet" not in nom_fichier and "interr" not in nom_fichier:
+            logger.warning(f"⚠️ Nom fichier ne correspond pas à COMPTA Internet: {fichier.name}")
+            # return False  # ← On ne retourne pas False ici pour tester quand même la structure
+
+        # 3️⃣ Lecture du fichier (avec gestion des erreurs)
+        engine = "openpyxl" if fichier.suffix.lower() == ".xlsx" else "xlrd"
+        logger.info(f"📖 Lecture avec moteur: {engine}")
+
+        try:
+            df = pd.read_excel(fichier, engine=engine, nrows=10)  # Lire 10 premières lignes
+            logger.info(f"📊 Colonnes détectées: {list(df.columns)}")
+        except Exception as e:
+            logger.error(f"❌ Erreur lecture Excel: {str(e)}")
+            return False
+
+        # 4️⃣ Normalisation des noms de colonnes (en minuscules et sans espaces)
+        colonnes = [str(c).strip().lower().replace(" ", "") for c in df.columns]
+        logger.info(f"🔤 Colonnes normalisées: {colonnes}")
+
+        # 5️⃣ Vérification des colonnes requises (exemples)
+        colonnes_requises = [
+            "date", "libellé", "montant", "n°commande",  # Français
+            "date", "description", "amount", "transactionid"  # Anglais
+        ]
+
+        colonnes_trouvees = sum(1 for col in colonnes if any(requis in col for requis in colonnes_requises))
+        logger.info(f"🎯 Colonnes requises trouvées: {colonnes_trouvees}/{len(colonnes_requises)}")
+
+        if colonnes_trouvees >= 3:  # Au moins 3 colonnes requises
+            logger.info(f"✅ Fichier COMPTA Internet détecté: {fichier.name}")
+            return True
+        else:
+            logger.warning(f"❌ Trop peu de colonnes requises trouvées")
+            return False
+
+    except Exception as e:
+        logger.error(f"💥 Erreur dans est_compta_internet({fichier}): {str(e)}")
+        return False
+
+
+

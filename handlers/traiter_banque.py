@@ -4,7 +4,6 @@ from typing import Optional
 from config import DOSSIER_SORTIE
 from logger import logger
 
-
 # ==========================================================
 # EXCEPTION MÉTIER
 # ==========================================================
@@ -12,7 +11,6 @@ from logger import logger
 class NotBanqueFileError(Exception):
     """Levée si aucune transaction bancaire exploitable n'est trouvée."""
     pass
-
 
 # ==========================================================
 # CONSTANTES COMPTABLES
@@ -23,7 +21,6 @@ JOURNAL    = "CEBOOBA"
 AUXILIAIRE = ""
 ANALYTIQUE = ""
 
-
 # ==========================================================
 # MAPPING CONTRATS → CLÉ MÉTIER
 # ==========================================================
@@ -33,7 +30,6 @@ CONTRATS = {
     "8430996":    "CB",
 }
 
-
 # ==========================================================
 # UTILITAIRES
 # ==========================================================
@@ -42,16 +38,14 @@ def format_montant(valeur: float) -> str:
     """Formate un montant en chaîne comptable française. Ex : 1234.5 → '1234,50'"""
     return f"{abs(valeur):.2f}".replace(".", ",")
 
-
-def _construire_libelle_banque(cle: str, date_ecriture: str) -> str:
+def _construire_libelle_banque(cle: str, date_ecriture: str, date_banque_jjmmaa: str) -> str:
     """Construit le libellé normalisé pour les lignes de contrepartie banque."""
-    libelles = {
-        "CB":     f"CB DOMAINE DE LOIS DU {date_ecriture}",
-        "AMEX":   f"AMEX INTERNET DU {date_ecriture}",
-        "PLANET": f"PLANET DU {date_ecriture}",
-    }
-    return libelles.get(cle, f"BANQUE DU {date_ecriture}")
-
+    if cle == "CB":
+        # Format spécial pour le contrat CB : "CB DOMAINE DE LOIS JJMMAA"
+        return f"CB DOMAINE DE LOIS {date_banque_jjmmaa}"
+    else:
+        # Format standard pour les autres contrats
+        return f"{cle} DU {date_ecriture}"
 
 def _parser_date_banque(date_c1: str) -> Optional[str]:
     """
@@ -69,6 +63,19 @@ def _parser_date_banque(date_c1: str) -> Optional[str]:
         logger.error(f"Date bancaire invalide : {date_c1!r}")
         return None
 
+def _parser_date_banque_jjmmaa(date_c1: str) -> Optional[str]:
+    """
+    Parse la date bancaire depuis le format court YY/MM/DD
+    et retourne la date au format jjmmaa.
+
+    Exemple : '26/01/09' → '260109'
+    """
+    try:
+        annee_court, mois, jour = date_c1.split("/")
+        return f"{jour}{mois}{annee_court}"
+    except (ValueError, IndexError):
+        logger.error(f"Date bancaire invalide : {date_c1!r}")
+        return None
 
 # ==========================================================
 # HANDLER PRINCIPAL
@@ -115,8 +122,13 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
         if not date_ecriture:
             raise NotBanqueFileError(f"Date bancaire non parseable : {date_raw!r}")
 
+        date_banque_jjmmaa = _parser_date_banque_jjmmaa(date_raw)
+        if not date_banque_jjmmaa:
+            raise NotBanqueFileError(f"Date bancaire non parseable : {date_raw!r}")
+
         piece = f"JOURNEE DU {date_ecriture}"
         logger.debug(f"Date écriture banque : {date_ecriture}")
+        logger.debug(f"Date banque format jjmmaa : {date_banque_jjmmaa}")
 
         # ----------------------------------------------------------
         # 2. Parcours des transactions
@@ -205,10 +217,13 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
         else:
             d, c = "", format_montant(montant)
 
+        # Utilisation de la date au format jjmmaa pour tous les contrats
+        libelle = _construire_libelle_banque(cle, date_ecriture, date_banque_jjmmaa)
+
         lignes_via.append({
-            "objet": _construire_libelle_banque(cle, date_ecriture),
-            "d":     d,
-            "c":     c,
+            "objet": libelle,
+            "d": d,
+            "c": c,
         })
 
     # ----------------------------------------------------------
