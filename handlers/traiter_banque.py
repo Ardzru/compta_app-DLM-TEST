@@ -41,22 +41,19 @@ def format_montant(valeur: float) -> str:
 def _construire_libelle_banque(cle: str, date_ecriture: str, date_banque_jjmmaa: str) -> str:
     """Construit le libellé normalisé pour les lignes de contrepartie banque."""
     if cle == "CB":
-        # Format spécial pour le contrat CB : "CB DOMAINE DE LOIS JJMMAA"
         return f"CB DOMAINE DE LOIS {date_banque_jjmmaa}"
     else:
-        # Format standard pour les autres contrats
         return f"{cle} DU {date_ecriture}"
 
 def _parser_date_banque(date_c1: str) -> Optional[str]:
     """
     Parse la date bancaire depuis le format court YY/MM/DD
     et retourne la date comptable J-1 au format DD/MM/YYYY.
-
     Exemple : '26/01/09' → '25/01/2009'
     """
     try:
         annee_court, mois, jour = date_c1.split("/")
-        annee = f"20{annee_court}"
+        annee   = f"20{annee_court}"
         jour_j1 = f"{int(jour) - 1:02d}"
         return f"{jour_j1}/{mois}/{annee}"
     except (ValueError, IndexError):
@@ -67,7 +64,6 @@ def _parser_date_banque_jjmmaa(date_c1: str) -> Optional[str]:
     """
     Parse la date bancaire depuis le format court YY/MM/DD
     et retourne la date au format jjmmaa.
-
     Exemple : '26/01/09' → '260109'
     """
     try:
@@ -91,7 +87,9 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
     Règles métier :
     - Seules les lignes TRANSACTION + CAPTURED sont traitées
     - Contrats reconnus : AMEX / PLANET / CB
-    - Une ligne de contrepartie par contrat si solde non nul
+    - DEBIT  source = vente        → C (crédit comptable)
+    - CREDIT source = remboursement → D (débit  comptable)
+    - Contrepartie banque : VENTE → D, REMBOURSEMENT → C (2 lignes séparées si besoin)
     """
 
     fichier = Path(fichier)
@@ -100,11 +98,13 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
 
     logger.info(f"Traitement BANQUE : {fichier.name}")
 
-    lignes_detail  = []
-    nb_ignores     = 0
+    lignes_detail = []
+    nb_ignores    = 0
 
-    # Cumul par contrat : montants en centimes (int) pour éviter les flottants
-    totaux = {cle: {"D": 0, "C": 0} for cle in CONTRATS.values()}
+    # Cumul par contrat en centimes (int) pour éviter les flottants
+    # ventes   = lignes DEBIT  source
+    # rembours = lignes CREDIT source
+    totaux = {cle: {"ventes": 0, "rembours": 0} for cle in CONTRATS.values()}
 
     with open(fichier, newline="", encoding="latin1") as f:
         reader = csv.reader(f, delimiter=";")
@@ -164,13 +164,19 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 nb_ignores += 1
                 continue
 
-            # Sens comptable
+            # --------------------------------------------------
+            # Sens comptable lignes détail (inchangé) :
+            #   DEBIT  source = vente        → C
+            #   CREDIT source = remboursement → D
+            # --------------------------------------------------
             if sens_source == "DEBIT":
-                d, c          = "", format_montant(montant_eur)
-                sens_compte   = "C"
+                d, c = "", format_montant(montant_eur)
+                totaux[cle]["ventes"] += montant_devise
+
             elif sens_source == "CREDIT":
-                d, c          = format_montant(montant_eur), ""
-                sens_compte   = "D"
+                d, c = format_montant(montant_eur), ""
+                totaux[cle]["rembours"] += montant_devise
+
             else:
                 logger.warning(f"Ligne {idx} ignorée : sens inconnu {sens_source!r}")
                 nb_ignores += 1
@@ -181,8 +187,6 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 "d":     d,
                 "c":     c,
             })
-
-            totaux[cle][sens_compte] += montant_devise
 
     # ----------------------------------------------------------
     # 3. Vérification
@@ -198,33 +202,37 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
     )
 
     # ----------------------------------------------------------
-    # 4. Lignes de contrepartie bancaire (une par contrat)
+    # 4. Lignes de contrepartie bancaire
+    #    VENTES        → D (débit)
+    #    REMBOURSEMENTS → C (crédit)
+    #    2 lignes séparées si les deux existent pour un même contrat
     # ----------------------------------------------------------
     lignes_via = []
 
     for cle, valeurs in totaux.items():
-        total_c = valeurs["C"]
-        total_d = valeurs["D"]
 
-        if total_c == total_d:
-            logger.debug(f"Contrat {cle} équilibré, pas de contrepartie")
-            continue
+        total_ventes   = valeurs["ventes"]
+        total_rembours = valeurs["rembours"]
 
-        montant = abs(total_c - total_d) / 100
-
-        if total_c > total_d:
-            d, c = format_montant(montant), ""
-        else:
-            d, c = "", format_montant(montant)
-
-        # Utilisation de la date au format jjmmaa pour tous les contrats
         libelle = _construire_libelle_banque(cle, date_ecriture, date_banque_jjmmaa)
 
-        lignes_via.append({
-            "objet": libelle,
-            "d": d,
-            "c": c,
-        })
+        if total_ventes > 0:
+            montant_vente = total_ventes / 100
+            lignes_via.append({
+                "objet": libelle,
+                "d": format_montant(montant_vente),
+                "c": "",
+            })
+
+        if total_rembours > 0:
+            montant_remb = total_rembours / 100
+            lignes_via.append({
+                "objet": libelle,
+                "d": "",
+                "c": format_montant(montant_remb),
+            })
+
+            logger.debug(f"Contrepartie REMBOURSEMENT {cle} : {format_montant(montant_remb)} C")
 
     # ----------------------------------------------------------
     # 5. Export CSV
@@ -239,7 +247,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
         writer.writerow([
             "STE", "DATE", "COMPTE", "Auxiliaire",
             "n°pièce", "OBJET", "D", "C",
-            "Journal", "Analytique"
+            "Journal", "Analytique",
         ])
 
         for l in lignes_detail + lignes_via:
@@ -249,5 +257,8 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 JOURNAL, ANALYTIQUE,
             ])
 
-    logger.info(f"Export BANQUE : {sortie.name} ({len(lignes_detail + lignes_via)} écritures)")
+    logger.info(
+        f"Export BANQUE : {sortie.name} "
+        f"({len(lignes_detail + lignes_via)} écritures)"
+    )
     return sortie
