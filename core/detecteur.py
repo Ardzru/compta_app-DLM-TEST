@@ -52,6 +52,33 @@ def est_amex_internet(fichier: Path) -> bool:
     except:
         return False
 
+# ----------------------------
+# PLANET  ← AVANT ALMA
+# ----------------------------
+def est_planet(fichier: Path) -> bool:
+    if fichier.suffix.lower() != ".xlsx":
+        return False
+    try:
+        fichier = Path(fichier)
+        df = pd.read_excel(fichier, header=None, engine="openpyxl", nrows=10)
+
+        for i in range(min(10, len(df))):
+            headers = df.iloc[i].astype(str).str.strip().str.upper().tolist()
+            # Planet a toujours ces colonnes spécifiques
+            if "MID" in headers and "TERMINAL ID" in headers:
+                logger.debug(f"[PLANET] ✅ {fichier.name} — ligne {i}")
+                return True
+            # Variante : Batch No. + Gross Amount EUR = signature Planet
+            if "BATCH NO." in headers and "GROSS AMOUNT EUR" in headers:
+                logger.debug(f"[PLANET] ✅ {fichier.name} — ligne {i} (signature Batch/Gross)")
+                return True
+
+        logger.debug(f"[PLANET] ❌ {fichier.name} — aucune signature trouvée")
+        return False
+    except Exception as e:
+        logger.debug(f"[PLANET] ❌ {fichier.name} — exception: {e}")
+        return False
+
 
 # ----------------------------
 # ALMA
@@ -191,59 +218,44 @@ def est_alpilink(fichier: Path) -> bool:
 # Critère visuel : Image 4 (fichier Sage avec colonnes spécifiques)
 # ----------------------------
 def est_compta_internet(fichier: Path) -> bool:
-    """
-    Détecte si un fichier est un fichier COMPTA Internet.
-    Affiche des logs détaillés pour comprendre pourquoi ça échoue.
-    """
     try:
         fichier = Path(fichier)
         logger.info(f"🔍 Vérification fichier COMPTA: {fichier.name}")
 
-        # 1️⃣ Vérification de l'extension
         if fichier.suffix.lower() not in [".xls", ".xlsx"]:
-            logger.warning(f"❌ Fichier {fichier.name} n'est pas un Excel (.xls/.xlsx)")
             return False
 
-        # 2️⃣ Vérification du nom de fichier (optionnel mais utile)
         nom_fichier = fichier.name.lower()
+
+        # ✅ AJOUT : exclure explicitement les fichiers Planet
+        if nom_fichier.startswith("fr_") and "statement" in nom_fichier:
+            logger.info(f"⛔ Exclu (Planet Statement): {fichier.name}")
+            return False
+
         if "pmt internet" not in nom_fichier and "interr" not in nom_fichier:
             logger.warning(f"⚠️ Nom fichier ne correspond pas à COMPTA Internet: {fichier.name}")
-            # return False  # ← On ne retourne pas False ici pour tester quand même la structure
+            return False  # ← DÉCOMMENTER cette ligne !
 
-        # 3️⃣ Lecture du fichier (avec gestion des erreurs)
         engine = "openpyxl" if fichier.suffix.lower() == ".xlsx" else "xlrd"
-        logger.info(f"📖 Lecture avec moteur: {engine}")
+        df = pd.read_excel(fichier, engine=engine, nrows=10)
 
-        try:
-            df = pd.read_excel(fichier, engine=engine, nrows=10)  # Lire 10 premières lignes
-            logger.info(f"📊 Colonnes détectées: {list(df.columns)}")
-        except Exception as e:
-            logger.error(f"❌ Erreur lecture Excel: {str(e)}")
-            return False
-
-        # 4️⃣ Normalisation des noms de colonnes (en minuscules et sans espaces)
         colonnes = [str(c).strip().lower().replace(" ", "") for c in df.columns]
         logger.info(f"🔤 Colonnes normalisées: {colonnes}")
 
-        # 5️⃣ Vérification des colonnes requises (exemples)
-        colonnes_requises = [
-            "date", "libellé", "montant", "n°commande",  # Français
-            "date", "description", "amount", "transactionid"  # Anglais
-        ]
-
+        colonnes_requises = ["date", "libellé", "montant", "n°commande", "description", "amount", "transactionid"]
         colonnes_trouvees = sum(1 for col in colonnes if any(requis in col for requis in colonnes_requises))
         logger.info(f"🎯 Colonnes requises trouvées: {colonnes_trouvees}/{len(colonnes_requises)}")
 
-        if colonnes_trouvees >= 3:  # Au moins 3 colonnes requises
+        if colonnes_trouvees >= 3:
             logger.info(f"✅ Fichier COMPTA Internet détecté: {fichier.name}")
             return True
-        else:
-            logger.warning(f"❌ Trop peu de colonnes requises trouvées")
-            return False
+
+        return False
 
     except Exception as e:
         logger.error(f"💥 Erreur dans est_compta_internet({fichier}): {str(e)}")
         return False
+
 
 
 

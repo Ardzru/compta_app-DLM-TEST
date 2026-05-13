@@ -14,6 +14,7 @@ from core.detecteur import (
     est_banque_internet,
     est_alpilink,
     est_compta_internet,
+    est_planet,
 )
 
 from handlers.traiter_ancv           import traiter_ancv
@@ -27,6 +28,7 @@ from handlers.traiter_kiosk_photo    import traiter_kiosk_photo
 from handlers.banque_handler         import traiter_banque
 from handlers.alpilink_handler       import traiter_alpilink
 from handlers.compta_handler         import traiter_compta
+from handlers.traiter_planet         import traiter_planet
 
 from utils.convert_xls import convertir_xls_en_xlsx
 from logger import logger
@@ -74,6 +76,11 @@ def traiter_fichier(fichier: Path) -> bool:
         if detected_amex_internet:
             logger.info(f"AMEX INTERNET détecté : {fichier.name}")
             traiter_amex_internet(fichier_traitement)
+            traite = True
+
+        if est_planet(fichier_traitement):
+            logger.info(f"PLANET détecté : {fichier.name}")
+            traiter_planet(fichier_traitement)
             traite = True
 
         if detected_avoirs:
