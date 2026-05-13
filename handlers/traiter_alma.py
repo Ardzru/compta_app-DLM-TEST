@@ -1,3 +1,4 @@
+import csv
 import pandas as pd
 from pathlib import Path
 from collections import defaultdict
@@ -5,7 +6,7 @@ from typing import Optional
 from config import DOSSIER_SORTIE
 from logger import logger
 from datetime import date
-from core.moniteur_schema import comparer_schema   # ← AJOUT
+from core.moniteur_schema import comparer_schema
 
 # ==========================================================
 # EXCEPTION MÉTIER
@@ -18,27 +19,31 @@ class NotAlmaFileError(Exception):
 # ==========================================================
 # INDEX DES COLONNES
 # ==========================================================
-COL_DATE      = 1   # Date de transaction   (colonne B)
-COL_MONTANT   = 2   # Montant total         (colonne C)
-COL_TVA       = 4   # TVA                   (colonne E)
-COL_FRAIS     = 5   # Frais ALMA            (colonne F)
-COL_REFERENCE = 11  # Référence transaction (colonne L)
+COL_DATE      = 1
+COL_MONTANT   = 2
+COL_TVA       = 4
+COL_FRAIS     = 5
+COL_REFERENCE = 11
+
+# ==========================================================
+# CONSTANTES COMPTABLES
+# ==========================================================
+STE              = "DLM"
+JOURNAL          = "AC"
+COMPTE_TRANSIT   = "580010DS5"
+COMPTE_BANQUE    = "512120"
+COMPTE_FOURN     = "401000"
+AUXILIAIRE_FOURN = "ALMA"
 
 # ==========================================================
 # UTILITAIRES
 # ==========================================================
 
 def nettoyer_montant(val) -> float:
-    """
-    Nettoie et convertit un montant ALMA en float.
-    Le format ALMA exprime les montants en centimes → division par 100.
-    """
     if pd.isna(val):
         return 0.0
-
     s = str(val).strip()
     s = s.replace(".", "").replace("-", "").replace(",", ".")
-
     try:
         return float(s) / 100
     except ValueError:
@@ -46,7 +51,6 @@ def nettoyer_montant(val) -> float:
         return 0.0
 
 def formater_date(val) -> Optional[str]:
-    """Formate une date au format JJ/MM/AAAA (libellé de pièce)."""
     d = pd.to_datetime(val, errors="coerce")
     if pd.isna(d):
         logger.warning(f"Date invalide ignorée : {val!r}")
@@ -54,10 +58,6 @@ def formater_date(val) -> Optional[str]:
     return d.strftime("%d/%m/%Y")
 
 def formater_date_ecriture(val, jours_a_ajouter: int = 8) -> Optional[str]:
-    """
-    Calcule la date d'écriture comptable.
-    Par défaut : date ALMA + 8 jours ouvrés.
-    """
     d = pd.to_datetime(val, errors="coerce")
     if pd.isna(d):
         logger.warning(f"Date invalide pour calcul d'écriture : {val!r}")
@@ -65,7 +65,6 @@ def formater_date_ecriture(val, jours_a_ajouter: int = 8) -> Optional[str]:
     return (d + pd.Timedelta(days=jours_a_ajouter)).strftime("%d/%m/%Y")
 
 def monter_montant(valeur: float) -> str:
-    """Formate un float en chaîne comptable (virgule, 2 décimales)."""
     return f"{abs(valeur):.2f}".replace(".", ",")
 
 # ==========================================================
@@ -79,8 +78,10 @@ def traiter_alma(fichier: Path) -> None:
     Règles métier :
     - Montants en centimes → divisés par 100
     - Date d'écriture = date transaction + 8 jours
-    - 4 écritures par ligne : 580010DS5 / 445660 / 627800 / 512120
-    - Banque (512120) : UNE seule ligne par date d'écriture
+    - Écritures par ligne :
+        580010DS5   → C  (montant total vente, compte transit)
+        401000/ALMA → D  (frais TTC = TVA + frais HT, compte fournisseur)
+        512120      → D  (montant net, UNE ligne par date d'écriture)
     """
 
     fichier = Path(fichier)
@@ -90,7 +91,7 @@ def traiter_alma(fichier: Path) -> None:
     logger.info(f"Traitement ALMA : {fichier.name}")
 
     # ----------------------------------------------------------
-    # 1. Lecture du fichier
+    # 1. Lecture
     # ----------------------------------------------------------
     try:
         df = pd.read_excel(fichier, engine="openpyxl")
@@ -99,19 +100,17 @@ def traiter_alma(fichier: Path) -> None:
         raise
 
     # ----------------------------------------------------------
-    # 1b. Vérification du schéma                    # ← AJOUT
+    # 1b. Vérification du schéma
     # ----------------------------------------------------------
-    comparer_schema(df, "alma")                      # ← AJOUT
+    comparer_schema(df, "alma")
 
     # ----------------------------------------------------------
     # 2. Accumulation par date d'écriture
-    # Structure : { date_ecriture: { "lignes": [...], "total_banque": float } }
     # ----------------------------------------------------------
     groupes: dict = defaultdict(lambda: {"lignes": [], "total_banque": 0.0})
 
     for idx, row in df.iterrows():
 
-        # Dates
         date_lib      = formater_date(row.iloc[COL_DATE])
         date_ecriture = formater_date_ecriture(row.iloc[COL_DATE])
 
@@ -119,7 +118,6 @@ def traiter_alma(fichier: Path) -> None:
             logger.warning(f"Ligne {idx} ignorée : date invalide")
             continue
 
-        # Montants
         montant_achat = nettoyer_montant(row.iloc[COL_MONTANT])
         tva           = nettoyer_montant(row.iloc[COL_TVA])
         frais         = nettoyer_montant(row.iloc[COL_FRAIS])
@@ -128,53 +126,46 @@ def traiter_alma(fichier: Path) -> None:
         if montant_achat == 0 and tva == 0 and frais == 0:
             continue
 
-        montant_net = montant_achat - (tva + frais)
-        objet = f"ALMA {date.today().strftime('%d-%m-%Y')}"
+        frais_ttc   = round(tva + frais, 2)
+        montant_net = round(montant_achat - frais_ttc, 2)
+        objet       = f"ALMA {date.today().strftime('%d-%m-%Y')}"
         groupe      = groupes[date_ecriture]
 
-        # Écriture 1 : Montant total vente (crédit compte transit ALMA)
+        # ── Écriture 1 : Compte transit (crédit montant total) ──
         groupe["lignes"].append({
-            "STE":        "DLM",
+            "STE":        STE,
             "DATE":       date_ecriture,
-            "COMPTE":     "580010DS5",
+            "COMPTE":     COMPTE_TRANSIT,
             "Auxiliaire": "",
             "n°pièce":    objet,
             "OBJET":      reference,
             "D":          "",
             "C":          monter_montant(montant_achat),
-            "Journal":    "AC",
+            "Journal":    JOURNAL,
             "Analytique": "",
         })
 
-        # Écriture 2 : TVA collectée
+        # ── Écriture 2 : Fournisseur ALMA (débit frais TTC) ──
         groupe["lignes"].append({
-            "STE":        "DLM",
+            "STE":        STE,
             "DATE":       date_ecriture,
-            "COMPTE":     "445660",
-            "Auxiliaire": "",
-            "n°pièce":    objet,
-            "OBJET":      f"TVA {objet}",
-            "D":          monter_montant(tva),
-            "C":          "",
-            "Journal":    "AC",
-            "Analytique": "",
-        })
-
-        # Écriture 3 : Frais ALMA
-        groupe["lignes"].append({
-            "STE":        "DLM",
-            "DATE":       date_ecriture,
-            "COMPTE":     "627800",
-            "Auxiliaire": "",
+            "COMPTE":     COMPTE_FOURN,
+            "Auxiliaire": AUXILIAIRE_FOURN,
             "n°pièce":    objet,
             "OBJET":      f"Frais {objet}",
-            "D":          monter_montant(frais),
+            "D":          monter_montant(frais_ttc),
             "C":          "",
-            "Journal":    "AC",
-            "Analytique": "ST-CT00-XX",
+            "Journal":    JOURNAL,
+            "Analytique": "",
         })
 
-        # Accumulation pour la ligne banque groupée
+        logger.debug(
+            f"Ligne {idx} | achat={montant_achat} "
+            f"tva={tva} frais={frais} "
+            f"frais_ttc={frais_ttc} net={montant_net}"
+        )
+
+        # Accumulation banque
         groupe["total_banque"] += montant_net
 
     # ----------------------------------------------------------
@@ -195,19 +186,19 @@ def traiter_alma(fichier: Path) -> None:
             logger.warning(f"Total banque nul pour {date_ecriture}, ligne banque ignorée")
             continue
 
-        # ✅ Même OBJET que les lignes du groupe
-        objet_banque = groupe["lignes"][0]["OBJET"] if groupe["lignes"] else f"ALMA DU {date_ecriture}"
+        objet_banque = f"ALMA {date.today().strftime('%d-%m-%Y')}"
 
+        # ── Écriture 3 : Banque (débit, groupée par date) ──
         lignes_finales.append({
-            "STE": "DLM",
-            "DATE": date_ecriture,
-            "COMPTE": "512120",
+            "STE":        STE,
+            "DATE":       date_ecriture,
+            "COMPTE":     COMPTE_BANQUE,
             "Auxiliaire": "",
-            "n°pièce": objet,
-            "OBJET": objet,
-            "D": monter_montant(total_banque),
-            "C": "",
-            "Journal": "AC",
+            "n°pièce":    objet_banque,
+            "OBJET":      objet_banque,
+            "D":          monter_montant(total_banque),
+            "C":          "",
+            "Journal":    JOURNAL,
             "Analytique": "",
         })
 
