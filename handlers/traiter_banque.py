@@ -42,6 +42,10 @@ def _construire_libelle_banque(cle: str, date_ecriture: str, date_banque_jjmmaa:
     """Construit le libellé normalisé pour les lignes de contrepartie banque."""
     if cle == "CB":
         return f"CB DOMAINE DE LOIS {date_banque_jjmmaa}"
+    elif cle == "AMEX":
+        return f"AMEX DU {date_ecriture}"
+    elif cle == "PLANET":
+        return f"PLANET DU {date_ecriture}"
     else:
         return f"{cle} DU {date_ecriture}"
 
@@ -49,6 +53,7 @@ def _parser_date_banque(date_c1: str) -> Optional[str]:
     """
     Parse la date bancaire depuis le format court YY/MM/DD
     et retourne la date comptable J-1 au format DD/MM/YYYY.
+    Utilisé pour AMEX et PLANET.
     Exemple : '26/01/09' → '25/01/2009'
     """
     try:
@@ -63,7 +68,8 @@ def _parser_date_banque(date_c1: str) -> Optional[str]:
 def _parser_date_banque_jjmmaa(date_c1: str) -> Optional[str]:
     """
     Parse la date bancaire depuis le format court YY/MM/DD
-    et retourne la date au format jjmmaa.
+    et retourne la date au format jjmmaa SANS -1 jour.
+    Utilisé pour le libellé CB.
     Exemple : '26/01/09' → '260109'
     """
     try:
@@ -90,6 +96,9 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
     - DEBIT  source = vente        → C (crédit comptable)
     - CREDIT source = remboursement → D (débit  comptable)
     - Contrepartie banque : VENTE → D, REMBOURSEMENT → C (2 lignes séparées si besoin)
+    - CB     : date J   (sans -1) dans le libellé
+    - AMEX   : date J-1 dans le libellé
+    - PLANET : date J-1 dans le libellé
     """
 
     fichier = Path(fichier)
@@ -114,36 +123,29 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
         # ----------------------------------------------------------
         try:
             premiere_ligne = next(reader)
-            date_raw = premiere_ligne[2].split("_")[0]
-        except (StopIteration, IndexError):
-            raise NotBanqueFileError(f"Fichier bancaire vide ou mal formé : {fichier.name}")
+            date_raw       = premiere_ligne[0].strip()
+            date_ecriture  = _parser_date_banque(date_raw)        # J-1 → AMEX / PLANET
+            date_banque_jjmmaa = _parser_date_banque_jjmmaa(date_raw)  # J   → CB libellé
+            piece          = premiere_ligne[1].strip() if len(premiere_ligne) > 1 else ""
+        except StopIteration:
+            raise NotBanqueFileError(f"Fichier vide : {fichier.name}")
 
-        date_ecriture = _parser_date_banque(date_raw)
         if not date_ecriture:
-            raise NotBanqueFileError(f"Date bancaire non parseable : {date_raw!r}")
-
-        date_banque_jjmmaa = _parser_date_banque_jjmmaa(date_raw)
-        if not date_banque_jjmmaa:
-            raise NotBanqueFileError(f"Date bancaire non parseable : {date_raw!r}")
-
-        piece = f"JOURNEE DU {date_ecriture}"
-        logger.debug(f"Date écriture banque : {date_ecriture}")
-        logger.debug(f"Date banque format jjmmaa : {date_banque_jjmmaa}")
+            raise NotBanqueFileError(f"Date invalide en première ligne : {fichier.name}")
 
         # ----------------------------------------------------------
-        # 2. Parcours des transactions
+        # 2. Lecture des lignes de transaction
         # ----------------------------------------------------------
         for idx, row in enumerate(reader, start=2):
-
-            if not row or len(row) < 9:
-                logger.debug(f"Ligne {idx} ignorée : trop courte ({len(row)} colonnes)")
+            if len(row) < 7:
                 nb_ignores += 1
                 continue
 
             type_ligne = row[0].strip().upper()
-            statut     = row[7].strip().upper()
+            statut     = row[2].strip().upper()
 
             if type_ligne != "TRANSACTION":
+                nb_ignores += 1
                 continue
 
             if statut != "CAPTURED":
@@ -165,7 +167,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 continue
 
             # --------------------------------------------------
-            # Sens comptable lignes détail (inchangé) :
+            # Sens comptable lignes détail :
             #   DEBIT  source = vente        → C
             #   CREDIT source = remboursement → D
             # --------------------------------------------------
@@ -203,7 +205,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
 
     # ----------------------------------------------------------
     # 4. Lignes de contrepartie bancaire
-    #    VENTES        → D (débit)
+    #    VENTES         → D (débit)
     #    REMBOURSEMENTS → C (crédit)
     #    2 lignes séparées si les deux existent pour un même contrat
     # ----------------------------------------------------------
@@ -223,6 +225,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 "d": format_montant(montant_vente),
                 "c": "",
             })
+            logger.debug(f"Contrepartie VENTE {cle} : {format_montant(montant_vente)} D")
 
         if total_rembours > 0:
             montant_remb = total_rembours / 100
@@ -231,7 +234,6 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 "d": "",
                 "c": format_montant(montant_remb),
             })
-
             logger.debug(f"Contrepartie REMBOURSEMENT {cle} : {format_montant(montant_remb)} C")
 
     # ----------------------------------------------------------
