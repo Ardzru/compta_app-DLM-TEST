@@ -85,7 +85,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
 
     totaux = {cle: {"ventes": 0, "rembours": 0} for cle in CONTRATS.values()}
 
-    with open(fichier, newline="", encoding="latin1") as f:
+    with open(fichier, newline="", encoding="utf-8-sig") as f:
         reader = csv.reader(f, delimiter=";")
 
         for idx, row in enumerate(reader):
