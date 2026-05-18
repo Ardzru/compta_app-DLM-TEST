@@ -102,7 +102,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                     date_brut = row[2].strip()
                     date_part = date_brut.split("_")[0]
                     try:
-                        aa, mm, jj = date_part.split("/")
+                        jj, mm, aa = date_part.split("/")
                         annee = f"20{aa}"
 
                         date_ecriture      = f"{jj}/{mm}/{annee}"
@@ -123,18 +123,23 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 continue
 
             # --------------------------------------------------
-            # 3. TRANSACTION → parsing
+            # 3. TRANSACTION → traitement
             # --------------------------------------------------
             if type_ligne == "TRANSACTION":
                 if len(row) < 8:
+                    logger.warning(f"Ligne {idx+1} trop courte : {row}")
                     nb_ignores += 1
                     continue
 
                 statut  = row[7].strip().upper()
+                if statut != "CAPTURED":
+                    nb_ignores += 1
+                    continue
+
                 contrat = row[4].strip()
                 type_op = row[5].strip().upper()
 
-                if statut != "CAPTURED":
+                if not contrat:
                     nb_ignores += 1
                     continue
 
