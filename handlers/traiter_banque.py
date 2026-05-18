@@ -16,10 +16,11 @@ class NotBanqueFileError(Exception):
 # CONSTANTES COMPTABLES
 # ==========================================================
 STE        = "DLM"
-COMPTE     = "580010DS5"
 JOURNAL    = "CEBOOBA"
 AUXILIAIRE = ""
 ANALYTIQUE = ""
+
+COMPTE_DEFAULT = "580010DS5"
 
 # ==========================================================
 # MAPPING CONTRATS → CLÉ MÉTIER
@@ -31,15 +32,31 @@ CONTRATS = {
 }
 
 # ==========================================================
+# CONFIG PAR TYPE DE CONTRAT
+# ==========================================================
+CONFIG_CONTRAT = {
+    "CB": {
+        "compte":  "580010DS5",
+        "journal": "CEBOOBA",
+    },
+    "AMEX": {
+        "compte":  "580010DS5",
+        "journal": "CEBOOBA",
+    },
+    "PLANET": {
+        "compte":  "580010DS5",
+        "journal": "CEBOOBA",
+    },
+}
+
+# ==========================================================
 # UTILITAIRES
 # ==========================================================
 
 def format_montant(valeur: float) -> str:
-    """Formate un montant en chaîne comptable française. Ex : 1234.5 → '1234,50'"""
     return f"{abs(valeur):.2f}".replace(".", ",")
 
 def _construire_libelle_banque(cle: str, date_ecriture: str, date_banque_jjmmaa: str) -> str:
-    """Construit le libellé normalisé pour les lignes de contrepartie banque."""
     if cle == "CB":
         return f"CB DOMAINE DE LOIS {date_banque_jjmmaa}"
     elif cle == "AMEX":
@@ -82,14 +99,14 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
             # --------------------------------------------------
             if type_ligne == "TITRE":
                 if len(row) >= 3:
-                    date_brut = row[2].strip()           # "26/05/14_02:01:01"
-                    date_part = date_brut.split("_")[0]  # "26/05/14"
+                    date_brut = row[2].strip()
+                    date_part = date_brut.split("_")[0]
                     try:
-                        aa, mm, jj = date_part.split("/")  # "26", "05", "14"
-                        annee = f"20{aa}"                  # "2026"
+                        aa, mm, jj = date_part.split("/")
+                        annee = f"20{aa}"
 
-                        date_ecriture      = f"{jj}/{mm}/{annee}"  # "14/05/2026"
-                        date_banque_jjmmaa = f"{jj}{mm}{aa}"       # "140526"
+                        date_ecriture      = f"{jj}/{mm}/{annee}"
+                        date_banque_jjmmaa = f"{jj}{mm}{aa}"
 
                         logger.debug(
                             f"Date écriture : {date_ecriture} | "
@@ -100,25 +117,22 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                 continue
 
             # --------------------------------------------------
-            # 2. CONTRAT → extraction numéro de pièce
+            # 2. ENTETE → ignoré
             # --------------------------------------------------
-            if type_ligne == "CONTRAT":
-                if len(row) >= 2:
-                    piece = row[1].strip()
-                    logger.debug(f"Numéro de pièce : {piece}")
+            if type_ligne == "ENTETE":
                 continue
 
             # --------------------------------------------------
-            # 3. DETAIL → transactions CAPTURED
+            # 3. TRANSACTION → parsing
             # --------------------------------------------------
-            if type_ligne == "DETAIL":
-                if len(row) < 6:
+            if type_ligne == "TRANSACTION":
+                if len(row) < 8:
                     nb_ignores += 1
                     continue
 
-                statut    = row[3].strip().upper()
-                contrat   = row[1].strip()
-                type_op   = row[4].strip().upper()
+                statut  = row[7].strip().upper()
+                contrat = row[4].strip()
+                type_op = row[5].strip().upper()
 
                 if statut != "CAPTURED":
                     nb_ignores += 1
@@ -131,20 +145,20 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                     continue
 
                 try:
-                    montant_brut = int(row[5].strip())
+                    montant_brut = int(row[6].strip())
                 except ValueError:
-                    logger.error(f"Montant invalide ligne {idx+1} : {row[5]!r}")
+                    logger.error(f"Montant invalide ligne {idx+1} : {row[6]!r}")
                     nb_ignores += 1
                     continue
 
                 montant_float = montant_brut / 100
 
-                if type_op == "VENTE":
+                if type_op == "DEBIT":
                     totaux[cle]["ventes"] += montant_brut
                     objet = f"VTE {cle} {date_banque_jjmmaa}"
                     d, c  = format_montant(montant_float), ""
 
-                elif type_op == "REMBOURSEMENT":
+                elif type_op == "CREDIT":
                     totaux[cle]["rembours"] += montant_brut
                     objet = f"RBT {cle} {date_banque_jjmmaa}"
                     d, c  = "", format_montant(montant_float)
@@ -158,6 +172,7 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
                     "objet": objet,
                     "d":     d,
                     "c":     c,
+                    "cle":   cle,
                 })
 
             else:
@@ -182,34 +197,34 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
     )
 
     # ----------------------------------------------------------
-    # Lignes contrepartie bancaire
+    # Lignes contrepartie banque (une par contrat actif)
     # ----------------------------------------------------------
     lignes_via = []
-
-    for cle, valeurs in totaux.items():
-        total_ventes   = valeurs["ventes"]
-        total_rembours = valeurs["rembours"]
-
+    for cle in CONTRATS.values():
+        total_ventes   = totaux[cle]["ventes"]
+        total_rembours = totaux[cle]["rembours"]
         libelle = _construire_libelle_banque(cle, date_ecriture, date_banque_jjmmaa)
 
         if total_ventes > 0:
-            montant_vente = total_ventes / 100
             lignes_via.append({
                 "objet": libelle,
-                "d":     format_montant(montant_vente),
+                "d":     format_montant(total_ventes / 100),
                 "c":     "",
+                "cle":   cle,
             })
 
         if total_rembours > 0:
-            montant_remb = total_rembours / 100
             lignes_via.append({
                 "objet": libelle,
                 "d":     "",
-                "c":     format_montant(montant_remb),
+                "c":     format_montant(total_rembours / 100),
+                "cle":   cle,
             })
 
+    toutes_lignes = lignes_detail + lignes_via
+
     # ----------------------------------------------------------
-    # Export CSV
+    # Export : un seul fichier CSV
     # ----------------------------------------------------------
     DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
     sortie = DOSSIER_SORTIE / f"{fichier.stem}_banque.csv"
@@ -222,15 +237,16 @@ def traiter_banque(fichier: Path) -> Optional[Path]:
             "Journal", "Analytique",
         ])
 
-        for l in lignes_detail + lignes_via:
+        for l in toutes_lignes:
+            cfg     = CONFIG_CONTRAT.get(l["cle"], {})
+            compte  = cfg.get("compte",  COMPTE_DEFAULT)
+            journal = cfg.get("journal", JOURNAL)
+
             writer.writerow([
-                STE, date_ecriture, COMPTE, AUXILIAIRE,
+                STE, date_ecriture, compte, AUXILIAIRE,
                 piece, l["objet"], l["d"], l["c"],
-                JOURNAL, ANALYTIQUE,
+                journal, ANALYTIQUE,
             ])
 
-    logger.info(
-        f"Export BANQUE : {sortie.name} "
-        f"({len(lignes_detail + lignes_via)} écritures)"
-    )
+    logger.info(f"Export BANQUE : {sortie.name} ({len(toutes_lignes)} écritures)")
     return sortie
