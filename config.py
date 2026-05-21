@@ -1,9 +1,8 @@
-# config.py
 import sys
 import logging
 from pathlib import Path
 
-# ── Logger bootstrap ─────────────────────────────────────────────────────────
+# ── Logger bootstrap ──────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.DEBUG)
 _log = logging.getLogger("config")
 
@@ -21,20 +20,38 @@ else:
 _log.debug(f"BASE_DIR = {BASE_DIR}")
 
 # ── Chemins relatifs à BASE_DIR ───────────────────────────────────────────────
-DOSSIER_BRUT   = BASE_DIR / "fichiers_brut"
-DOSSIER_BACKUP = BASE_DIR / "backup"
-DOSSIER_SORTIE = BASE_DIR / "sorties" / "fichiers_compta"
-
-# Dossier dédié aux exports de justification internet
+DOSSIER_BRUT          = BASE_DIR / "fichiers_brut"
+DOSSIER_BACKUP        = BASE_DIR / "backup"
+DOSSIER_SORTIE        = BASE_DIR / "sorties" / "fichiers_compta"
 DOSSIER_JUSTIFICATION = BASE_DIR / "sorties" / "justification"
+DOSSIER_SAISIES       = BASE_DIR / "data" / "saisies"          # ← NOUVEAU
 
-_log.debug(f"DOSSIER_BRUT          = {DOSSIER_BRUT}")
-_log.debug(f"DOSSIER_BACKUP        = {DOSSIER_BACKUP}")
-_log.debug(f"DOSSIER_SORTIE        = {DOSSIER_SORTIE}")
-_log.debug(f"DOSSIER_JUSTIFICATION = {DOSSIER_JUSTIFICATION}")
+# ─────────────────────────────────────────────────────────────────────────────
+#  CAISSES – configuration
+#  ➜ Les saisons et leurs chemins sont désormais dans settings.json
+#    (à la racine du projet, à côté de ce fichier)
+#  ➜ Accès via : from core import settings_manager
+# ─────────────────────────────────────────────────────────────────────────────
 
-# ── Création des dossiers ─────────────────────────────────────────────────────
-for _d in [DOSSIER_BRUT, DOSSIER_BACKUP, DOSSIER_SORTIE, DOSSIER_JUSTIFICATION]:
+# Noms des mois en français pour construire le chemin
+# ⚠️ Doit correspondre EXACTEMENT au nom des dossiers sur le réseau
+CAISSES_MOIS_FR = {
+    1:  "01_Janvier",
+    2:  "02_Fevrier",
+    3:  "03_Mars",
+    4:  "04_Avril",
+    5:  "05_Mai",
+    6:  "06_Juin",
+    7:  "07_Juillet",
+    8:  "08_Aout",
+    9:  "09_Septembre",
+    10: "10_Octobre",
+    11: "11_Novembre",
+    12: "12_Decembre",
+}
+
+# ── Création des dossiers internes ────────────────────────────────────────────
+for _d in [DOSSIER_BRUT, DOSSIER_BACKUP, DOSSIER_SORTIE, DOSSIER_JUSTIFICATION, DOSSIER_SAISIES]:
     try:
         _d.mkdir(parents=True, exist_ok=True)
         _log.debug(f"Dossier OK : {_d}")
@@ -81,7 +98,9 @@ def chemin_backup(fichier: str) -> Path:
     return DOSSIER_BACKUP / fichier
 
 def chemin_justification(fichier: str) -> Path:
-    """Retourne un chemin dans le dossier d'export justification."""
     return DOSSIER_JUSTIFICATION / fichier
+
+def chemin_saisie(fichier: str) -> Path:
+    return DOSSIER_SAISIES / fichier
 
 _log.debug("=== config.py chargé avec succès ===")

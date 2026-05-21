@@ -17,18 +17,19 @@ from core.detecteur import (
     est_planet,
 )
 
-from handlers.traiter_ancv           import traiter_ancv
-from handlers.traiter_alma           import traiter_alma
-from handlers.traiter_amex_caisse    import traiter_amex_caisse
-from handlers.traiter_amex_internet  import traiter_amex_internet
-from handlers.traiter_banque         import traiter_banque as traiter_banque_csv
-from handlers.traiter_ta             import traiter_ta
-from handlers.traiter_avoirs         import traiter_avoirs
-from handlers.traiter_kiosk_photo    import traiter_kiosk_photo
-from handlers.banque_handler         import traiter_banque
-from handlers.alpilink_handler       import traiter_alpilink
-from handlers.compta_handler         import traiter_compta
-from handlers.traiter_planet         import traiter_planet
+from handlers.module_1.traiter_ancv           import traiter_ancv
+from handlers.module_1.traiter_alma           import traiter_alma
+from handlers.module_1.traiter_amex_caisse    import traiter_amex_caisse
+from handlers.module_1.traiter_amex_internet  import traiter_amex_internet
+from handlers.module_1.traiter_banque         import traiter_banque as traiter_banque_csv
+from handlers.module_1.traiter_ta             import traiter_ta
+from handlers.module_1.traiter_avoirs         import traiter_avoirs
+from handlers.module_1.traiter_kiosk_photo    import traiter_kiosk_photo
+from handlers.module_1.traiter_planet         import traiter_planet
+from handlers.module_2.banque_handler         import traiter_banque
+from handlers.module_2.alpilink_handler       import traiter_alpilink
+from handlers.module_2.compta_handler         import traiter_compta
+
 
 from utils.convert_xls import convertir_xls_en_xlsx
 from logger import logger

@@ -1,4 +1,9 @@
-pandas
-openpyxl
-chardet
-xlrd
+chardet==7.4.3
+et_xmlfile==2.0.0
+numpy==2.4.6
+openpyxl==3.1.5
+pandas==3.0.3
+python-dateutil==2.9.0.post0
+six==1.17.0
+tzdata==2026.2
+xlrd==2.0.2

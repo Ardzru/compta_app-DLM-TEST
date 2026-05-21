@@ -1,0 +1,38 @@
+{
+  "societe": "DLM",
+  "caisses": {
+    "saison_active": "Ete 2026",
+    "saisons": [
+      {
+        "nom": "Ete 2026",
+        "date_debut": "2026-05-01",
+        "date_fin":   "2026-10-31",
+        "chemin":     "X:\\Feuille de caisses\\2025-2026\\Ete 2026"
+      },
+      {
+        "nom": "Hiver 2025-2026",
+        "date_debut": "2025-11-01",
+        "date_fin":   "2026-04-30",
+        "chemin":     "X:\\Feuille de caisses\\2025-2026\\Hiver 2025-2026"
+      },
+      {
+        "nom": "Ete 2027",
+        "date_debut": "2027-05-01",
+        "date_fin":   "2027-10-31",
+        "chemin":     "X:\\Feuille de caisses\\2026-2027\\Ete 2027"
+      },
+      {
+        "nom": "Hiver 2026-2027",
+        "date_debut": "2026-11-01",
+        "date_fin":   "2027-04-30",
+        "chemin":     "X:\\Feuille de caisses\\2026-2027\\Hiver 2026-2027"
+      }
+    ]
+  },
+  "chemins": {
+    "saisies":        "data/saisies",
+    "remises_banque": "data/remises_banque",
+    "backup":         "backup",
+    "sortie_compta":  "sorties/fichiers_compta"
+  }
+}
