@@ -1,0 +1,225 @@
+{
+  "attendu": {
+    "especes_bande": 505.0,
+    "cb_sans_contact": 0.0,
+    "cb_visa": 0.0,
+    "dcc_planet": 0.0,
+    "amex": 0.0,
+    "amex_sans_contact": 0.0,
+    "ancv_connect": 0.0,
+    "cheques_vac_bande": 725.0,
+    "bons_livraisons": 0.0,
+    "cheques_bande": 58.0,
+    "paiement_web": 0.0,
+    "virement": 0.0,
+    "cb_vad": 0.0,
+    "detail_especes": {
+      "500": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "200": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "100": {
+        "quantite": 5,
+        "montant": 500
+      },
+      "50": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "20": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "10": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "5": {
+        "quantite": 1,
+        "montant": 5
+      },
+      "2": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "1": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "0.5": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.2": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.1": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.05": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.02": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.01": {
+        "quantite": 0,
+        "montant": 0.0
+      }
+    },
+    "detail_cheques_vac": [],
+    "detail_ancv": [
+      {
+        "date": "CHEQUES VACANCES",
+        "heure": "",
+        "montant": 725.0
+      },
+      {
+        "date": "CHEQUES",
+        "heure": "",
+        "montant": 58.0
+      },
+      {
+        "date": "Total Paiements",
+        "heure": "",
+        "montant": 1288.0
+      },
+      {
+        "date": "Total Paiements",
+        "heure": "",
+        "montant": 1288.0
+      }
+    ],
+    "detail_cheques": [],
+    "detail_cheques_vac_coupures": {
+      "50": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "25": {
+        "quantite": 29,
+        "montant": 725
+      },
+      "20": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "10": {
+        "quantite": 0,
+        "montant": 0
+      }
+    }
+  },
+  "saisi": {
+    "especes_bande": 505.0,
+    "cb_sans_contact": 0.0,
+    "cb_visa": 0.0,
+    "dcc_planet": 0.0,
+    "amex": 0.0,
+    "amex_sans_contact": 0.0,
+    "ancv_connect": 0.0,
+    "cheques_vac_bande": 725.0,
+    "bons_livraisons": 0.0,
+    "cheques_bande": 58.0,
+    "paiement_web": 0.0,
+    "virement": 0.0,
+    "cb_vad": 0.0,
+    "detail_especes": {
+      "500": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "200": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "100": {
+        "quantite": 5,
+        "montant": 500
+      },
+      "50": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "20": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "10": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "5": {
+        "quantite": 1,
+        "montant": 5
+      },
+      "2": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "1": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "0.5": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.2": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.1": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.05": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.02": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.01": {
+        "quantite": 0,
+        "montant": 0.0
+      }
+    },
+    "detail_ancv_connect": [],
+    "detail_cheques": [
+      {
+        "numero": "646",
+        "montant": 58.0
+      }
+    ],
+    "detail_cheques_vac_coupures": {
+      "50": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "25": {
+        "quantite": 29,
+        "montant": 725
+      },
+      "20": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "10": {
+        "quantite": 0,
+        "montant": 0
+      }
+    }
+  },
+  "statut": "VALIDEE",
+  "timestamp": "2026-05-21T12:27:37.440008"
+}

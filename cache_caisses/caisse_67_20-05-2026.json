@@ -1,0 +1,231 @@
+{
+  "attendu": {
+    "especes_bande": 737.0,
+    "cb_sans_contact": 530.0,
+    "cb_visa": 151.0,
+    "dcc_planet": 0.0,
+    "amex": 0.0,
+    "amex_sans_contact": 0.0,
+    "telecolecte": 0.0,
+    "ancv_connect": 0.0,
+    "cheques_vac_bande": 60.0,
+    "bons_livraisons": 224.5,
+    "cheques_bande": 0.0,
+    "paiement_web": 0.0,
+    "virement": 0.0,
+    "cb_vad": 0.0,
+    "total_bandes": 1702.5,
+    "total_paiements": 1702.5,
+    "erreur_caisse": 0.0,
+    "surplus_cheques_vac": 0.0,
+    "total_especes_compte": 737.0,
+    "detail_especes": {
+      "500": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "200": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "100": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "50": {
+        "quantite": 7,
+        "montant": 350
+      },
+      "20": {
+        "quantite": 19,
+        "montant": 380
+      },
+      "10": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "5": {
+        "quantite": 1,
+        "montant": 5
+      },
+      "2": {
+        "quantite": 1,
+        "montant": 2
+      },
+      "1": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "0.5": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.2": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.1": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.05": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.02": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.01": {
+        "quantite": 0,
+        "montant": 0.0
+      }
+    },
+    "detail_cheques_vac": [],
+    "detail_ancv": [
+      {
+        "date": "CHEQUES VACANCES",
+        "heure": "",
+        "montant": 60.0
+      },
+      {
+        "date": "BONS DE LIVRAISONS",
+        "heure": "",
+        "montant": 224.5
+      },
+      {
+        "date": "Total Paiements",
+        "heure": "",
+        "montant": 1702.5
+      },
+      {
+        "date": "Total Bandes",
+        "heure": "",
+        "montant": 1702.5
+      },
+      {
+        "date": "Total Paiements",
+        "heure": "",
+        "montant": 1702.5
+      }
+    ],
+    "detail_cheques": [],
+    "detail_cheques_vac_coupures": {
+      "50": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "25": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "20": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "10": {
+        "quantite": 6,
+        "montant": 60
+      }
+    }
+  },
+  "saisi": {
+    "especes_bande": 737.0,
+    "cb_sans_contact": 530.0,
+    "cb_visa": 151.0,
+    "dcc_planet": 0.0,
+    "amex": 0.0,
+    "amex_sans_contact": 0.0,
+    "ancv_connect": 0.0,
+    "cheques_vac_bande": 60.0,
+    "bons_livraisons": 224.5,
+    "cheques_bande": 0.0,
+    "paiement_web": 0.0,
+    "virement": 0.0,
+    "cb_vad": 0.0,
+    "detail_especes": {
+      "500": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "200": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "100": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "50": {
+        "quantite": 7,
+        "montant": 350
+      },
+      "20": {
+        "quantite": 19,
+        "montant": 380
+      },
+      "10": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "5": {
+        "quantite": 1,
+        "montant": 5
+      },
+      "2": {
+        "quantite": 1,
+        "montant": 2
+      },
+      "1": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "0.5": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.2": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.1": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.05": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.02": {
+        "quantite": 0,
+        "montant": 0.0
+      },
+      "0.01": {
+        "quantite": 0,
+        "montant": 0.0
+      }
+    },
+    "detail_cheques_vac_coupures": {
+      "50": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "25": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "20": {
+        "quantite": 0,
+        "montant": 0
+      },
+      "10": {
+        "quantite": 6,
+        "montant": 60
+      }
+    },
+    "detail_ancv_connect": [],
+    "detail_cheques": []
+  },
+  "statut": "VALIDEE",
+  "timestamp": "2026-05-21T15:41:07.649601"
+}

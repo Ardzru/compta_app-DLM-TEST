@@ -71,7 +71,7 @@ class MainWindow:
             w.destroy()
         self.root.resizable(True, True)
         self.root.geometry("750x650")
-        from ui.transform_view import TransformView
+        from modules.module_1.ui.transform_view import TransformView
         TransformView(self.root, self._build_home)
 
     def _ouvrir_justification(self):
@@ -79,13 +79,13 @@ class MainWindow:
             w.destroy()
         self.root.resizable(True, True)
         self.root.geometry("750x650")
-        from ui.justification_view import JustificationView
+        from modules.module_2.ui.justification_view import JustificationView
         JustificationView(self.root, self._build_home)
 
-    def _ouvrir_caisses(self):
+    def _ouvrir_caisses(self):  # ✅ UNE SEULE FOIS
         for w in self.root.winfo_children():
             w.destroy()
         self.root.resizable(True, True)
         self.root.geometry("1100x750")
-        from ui.caisses_ui import AppCaisses
+        from modules.module_3.ui import AppCaisses
         AppCaisses(self.root, self._build_home)

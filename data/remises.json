@@ -1,0 +1,76 @@
+[
+  {
+    "id": 1,
+    "date_caisse": "2026-05-21",
+    "num_caisse": "MANUEL",
+    "type": "especes",
+    "detail": {
+      "500": 1,
+      "50": 0,
+      "20": 0,
+      "5": 0,
+      "2": 0
+    },
+    "remis_banque": false,
+    "date_remise": null,
+    "cree_le": "2026-05-21 15:26",
+    "valide_stock": false
+  },
+  {
+    "id": 2,
+    "date_caisse": "2026-05-21",
+    "num_caisse": "MANUEL",
+    "type": "especes",
+    "detail": {
+      "billets": {
+        "500": {
+          "quantite": 1,
+          "montant": 500.0
+        }
+      },
+      "total": 500.0
+    },
+    "remis_banque": false,
+    "date_remise": null,
+    "cree_le": "2026-05-21 15:29",
+    "valide_stock": false
+  },
+  {
+    "id": 3,
+    "date_caisse": "2026-05-21",
+    "num_caisse": "MANUEL",
+    "type": "especes",
+    "detail": {
+      "billets": {
+        "500": {
+          "quantite": 1,
+          "montant": 500.0
+        }
+      },
+      "total": 500.0
+    },
+    "remis_banque": false,
+    "date_remise": null,
+    "cree_le": "2026-05-21 15:36",
+    "valide_stock": false
+  },
+  {
+    "id": 4,
+    "date_caisse": "2026-05-21",
+    "num_caisse": "MANUEL",
+    "type": "especes",
+    "detail": {
+      "billets": {
+        "500": {
+          "quantite": 1,
+          "montant": 500.0
+        }
+      },
+      "total": 500.0
+    },
+    "remis_banque": false,
+    "date_remise": null,
+    "cree_le": "2026-05-21 15:40",
+    "valide_stock": false
+  }
+]

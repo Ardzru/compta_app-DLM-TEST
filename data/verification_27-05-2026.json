@@ -1,0 +1,103 @@
+{
+  "caisses_verif": {
+    "Caisse 67": {
+      "especes_bande": 372.0,
+      "cb_sans_contact": 606.0,
+      "cb_visa": 1200.0,
+      "dcc_planet": 0.0,
+      "amex": 0.0,
+      "amex_sans_contact": 0.0,
+      "ancv_connect": 0.0,
+      "cheques_vac_bande": 0.0,
+      "bons_livraisons": 1832.0,
+      "cheques_bande": 0.0,
+      "paiement_web": 0.0,
+      "virement": 0.0,
+      "cb_vad": 0.0,
+      "detail_especes": {
+        "500": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "200": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "100": {
+          "quantite": 3,
+          "montant": 300
+        },
+        "50": {
+          "quantite": 1,
+          "montant": 50
+        },
+        "20": {
+          "quantite": 1,
+          "montant": 20
+        },
+        "10": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "5": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "2": {
+          "quantite": 1,
+          "montant": 2
+        },
+        "1": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "0.5": {
+          "quantite": 0,
+          "montant": 0.0
+        },
+        "0.2": {
+          "quantite": 0,
+          "montant": 0.0
+        },
+        "0.1": {
+          "quantite": 0,
+          "montant": 0.0
+        },
+        "0.05": {
+          "quantite": 0,
+          "montant": 0.0
+        },
+        "0.02": {
+          "quantite": 0,
+          "montant": 0.0
+        },
+        "0.01": {
+          "quantite": 0,
+          "montant": 0.0
+        }
+      },
+      "detail_cheques_vac_coupures": {
+        "50": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "25": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "20": {
+          "quantite": 0,
+          "montant": 0
+        },
+        "10": {
+          "quantite": 0,
+          "montant": 0
+        }
+      },
+      "detail_ancv_connect": [],
+      "detail_cheques": [],
+      "validee": true,
+      "timestamp_validation": "2026-05-28T09:55:35.032432"
+    }
+  }
+}

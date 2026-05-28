@@ -1,0 +1,2410 @@
+Inspection Results
+HTML
+Unresolved file in a link
+index.html
+Cannot resolve file 'traiter'
+Internationalization
+Non-ASCII characters
+traiter_dossier.py
+Non-ASCII characters
+Non-ASCII symbols in ASCII word
+Proofreading
+Grammar
+__init__.py
+Les deux-points sont précédés d'une espace insécable.
+alpilink_handler.py
+Vérifiez la concordance de «montants» avec les noms précédents.
+app.py
+Le déterminant s'accorde avec le nom "popup".
+caisses_ui.py
+Le déterminant s'accorde avec le nom "popup".
+commandes.py
+Vérifiez la concordance de «acceptés» avec les noms précédents.
+Les deux-points sont précédés d'une espace insécable.
+Les deux-points sont précédés d'une espace insécable.
+Les chiffres s'écrivent généralement en lettres.
+Les deux-points sont précédés d'une espace insécable.
+constantes.py
+Le trait d'union est employé sans espace pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+date.py
+Les deux-points sont précédés d'une espace insécable.
+Vérifiez la concordance de «formatée» avec les noms précédents.
+Les deux-points sont précédés d'une espace insécable.
+fichiers.py
+Les deux-points sont précédés d'une espace insécable.
+Les deux-points sont précédés d'une espace insécable.
+justification_view.py
+Il manque une espace après le point.
+montant.py
+Les deux-points sont précédés d'une espace insécable.
+Les deux-points sont précédés d'une espace insécable.
+Une espace est nécessaire.
+Les deux-points sont précédés d'une espace insécable.
+Les deux-points sont précédés d'une espace insécable.
+Les deux-points sont précédés d'une espace insécable.
+Vérifiez la concordance de «décimales» avec les noms précédents.
+Les deux-points sont précédés d'une espace insécable.
+Les deux-points sont précédés d'une espace insécable.
+refactor_fix.py
+L'espace se place après le point.
+L'espace se place après le point.
+L'espace se place après le point.
+settings_manager.py
+Faute de typographie.
+Faute de typographie.
+traiter_amex_caisse.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+traiter_amex_internet.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+traiter_ancv.py
+Un trait d'union est nécessaire entre le verbe et le pronom à l'impératif.
+Le point-virgule est précédé d'une espace fine insécable.
+traiter_avoirs.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+traiter_banque.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Il semblerait qu'une espace surnuméraire s'est glissée entre ces deux mots.
+Possible typo: you repeated a whitespace
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Il semblerait qu'une espace surnuméraire s'est glissée entre ces deux mots.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Possible typo: you repeated a whitespace
+Possible typo: you repeated a whitespace
+"Flottants" et "ventes" ne semblent pas bien accordés.
+"Flottants" et "ventes" ne semblent pas bien accordés.
+Il semblerait qu'une espace surnuméraire s'est glissée entre ces deux mots.
+Il semblerait qu'une espace surnuméraire s'est glissée entre ces deux mots.
+Possible typo: you repeated a whitespace
+Possible typo: you repeated a whitespace
+traiter_dossier.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+traiter_kiosk_photo.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+traiter_planet.py
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+Ce signe est un trait d'union, il ne sert qu'à former des mots composés. Employez un tiret ou un autre signe de ponctuation plus approprié.
+traiter_ta.py
+Devant un substantif féminin commençant par une voyelle ou un h muet, la forme Ton est utilisée pour des raisons d'euphonie.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espace pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Vérifiez la concordance de «données» avec les noms précédents.
+Spelling
+__init__.py
+Typo: In word 'DEFAUT'
+__init__.py
+Typo: In word 'alpilink'
+__init__.py
+Typo: In word 'justif'
+Typo: In word 'alpilink'
+Typo: In word 'justif'
+__init__.py
+Typo: In word 'especes'
+__init__.py
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'AUTORISEES'
+Typo: In word 'DEFAUT'
+Typo: In word 'ecriture'
+Typo: In word 'annee'
+alpilink_handler.py
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'buyclub'
+Typo: In word 'Alpilink'
+Typo: In word 'buyclub'
+Typo: In word 'buyclub'
+Typo: In word 'buyclub'
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'buyclub'
+arbre.txt
+Typo: In word ''
+auto_kiosque.py
+Typo: In word 'derniere'
+Typo: In word 'especes'
+Typo: In word 'derniere'
+Typo: In word 'generees'
+Typo: In word 'generees'
+base_handler.py
+Typo: In word 'succes'
+Typo: In word 'RESULTAT'
+caisse_60_18-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_60_19-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_61_20-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_61_21-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_62_20-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_66_20-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_67_20-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisse_75_18-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'VALIDEE'
+caisses_ui.py
+Typo: In word 'especes'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'trouvee'
+Typo: In word 'especes'
+Typo: In word 'reussi'
+colonnes.py
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPILINK'
+Typo: In word 'ALPILINK'
+Typo: In word 'Alpilink'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'ALPI'
+Typo: In word 'DEFAUT'
+Typo: In word 'AUTORISEES'
+Typo: In word 'ALPILINK'
+Typo: In word 'ALPILINK'
+compta_app.log
+Typo: In word 'Matth'
+Typo: In word 'pleney'
+compta_handler.py
+Typo: In word 'ecriture'
+Typo: In word 'ecriture'
+Typo: In word 'ecriture'
+config.py
+Typo: In word 'Fevrier'
+Typo: In word 'Decembre'
+Typo: In word 'exts'
+constantes.py
+Typo: In word 'FOURN'
+Typo: In word 'FOURN'
+Typo: In word 'reglement'
+Typo: In word 'reglement'
+Typo: In word 'FOURN'
+Typo: In word 'FOURN'
+creer_excel_complet.py
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+dashboard.py
+Typo: In word 'succes'
+Typo: In word 'succes'
+Typo: In word 'succes'
+Typo: In word 'succes'
+date.py
+Typo: In word 'ecriture'
+Typo: In word 'annee'
+Typo: In word 'ecriture'
+Typo: In word 'annee'
+detail_caisse.py
+Typo: In word 'especes'
+Typo: In word 'VALIDEE'
+Typo: In word 'VALIDEE'
+Typo: In word 'Segoe'
+Typo: In word 'VALIDEE'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'especes'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'especes'
+Typo: In word 'Segoe'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'quantite'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'quantite'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'suppr'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'suppr'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'especes'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'VALIDEE'
+Typo: In word 'validee'
+Typo: In word 'VALIDEE'
+Typo: In word 'VALIDEE'
+Typo: In word 'VALIDEE'
+detecteur.py
+Typo: In word 'detecteur'
+Typo: In word 'nrows'
+Typo: In word 'nrows'
+Typo: In word 'identifiantpaiement'
+Typo: In word 'montantachat'
+Typo: In word 'referencede'
+Typo: In word 'crééheure'
+Typo: In word 'alpilink'
+Typo: In word 'ALPILINK'
+Typo: In word 'ALPILINK'
+Typo: In word 'alpilink'
+Typo: In word 'INTERR'
+Typo: In word 'interr'
+Typo: In word 'transactionid'
+Typo: In word 'alpilink'
+dispatcher.log
+Typo: In word 'Matth'
+Typo: In word 'pleney'
+dispatcher.py
+Typo: In word 'ALPILINK'
+Typo: In word 'ALPILINK'
+Typo: In word 'resultat'
+export_core.txt
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+export_modules.txt
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+generer_fichiers.py
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+JT_DOMAINE_DE_LOISIRS_DE_MORZINE_23749766_260526.csv
+Typo: In word 'commer'
+justification_handler.py
+Typo: In word 'alpi'
+Typo: In word 'ALPILINK'
+Typo: In word 'ALPILINK'
+Typo: In word 'alpilink'
+Typo: In word 'alpi'
+Typo: In word 'alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'ALPILINK'
+Typo: In word 'alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'alpis'
+Typo: In word 'alpilink'
+Typo: In word 'Alpilink'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'EFCE'
+Typo: In word 'FFEB'
+Typo: In word 'alpi'
+justification_view.py
+Typo: In word 'alpilink'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'alpi'
+Typo: In word 'Alpilink'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'validee'
+Typo: In word 'Segoe'
+Typo: In word 'alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'alpilink'
+Typo: In word 'alpi'
+Typo: In word 'alpi'
+Typo: In word 'validee'
+Typo: In word 'Alpi'
+Typo: In word 'Alpi'
+Typo: In word 'FADBD'
+lecteur_caisse.py
+Typo: In word 'Axess'
+Typo: In word 'especes'
+Typo: In word 'telecolecte'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'fval'
+Typo: In word 'quantite'
+main_window.py
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Carvalho'
+pour lancer test via cmd.txt
+Typo: In word 'Matth'
+Typo: In word 'Matth'
+project_export.txt
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+refactor_all_handlers.py
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+refactor_audit.py
+Typo: In word ''
+refactor_replace.py
+Typo: In word ''
+refactor_validation_report.py
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+Typo: In word ''
+remise_ui.py
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'Segoe'
+Typo: In word 'especes'
+Typo: In word 'especes'
+remises.json
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+remises.py
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'validees'
+settings.json
+Typo: In word 'societe'
+stock.json
+Typo: In word 'especes'
+Typo: In word 'derniere'
+stock.py
+Typo: In word 'derniere'
+Typo: In word 'especes'
+Typo: In word 'derniere'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'derniere'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'derniere'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'derniere'
+test_base_handler.py
+Typo: In word ''
+test_utils.py
+Typo: In word ''
+Typo: In word ''
+traitement.log
+Typo: In word 'Matth'
+traiter_alma.py
+Typo: In word 'ECHANCES'
+Typo: In word 'succes'
+Typo: In word 'succes'
+Typo: In word 'succes'
+Typo: In word 'succes'
+Typo: In word 'succes'
+traiter_amex_caisse.py
+Typo: In word 'reglement'
+Typo: In word 'reglement'
+traiter_amex_internet.py
+Typo: In word 'FOURN'
+traiter_ancv.py
+Typo: In word 'Etat'
+traiter_banque.py
+Typo: In word 'jjmmaa'
+Typo: In word 'jjmmaa'
+Typo: In word 'jjmmaa'
+Typo: In word 'rembours'
+Typo: In word 'jjmmaa'
+Typo: In word 'rembours'
+Typo: In word 'rembours'
+Typo: In word 'rembours'
+Typo: In word 'remb'
+traiter_planet.py
+Typo: In word 'FOURN'
+Typo: In word 'dcle'
+traiter_ta.py
+Typo: In word 'detecteur'
+transform_view.py
+Typo: In word 'Carvalho'
+Typo: In word 'Segoe'
+verification.py
+Typo: In word 'especes'
+Typo: In word 'especes'
+Typo: In word 'RECALCUL'
+Typo: In word 'especes'
+Typo: In word 'especes'
+verification_20-05-2026.json
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'amex'
+Typo: In word 'especes'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'quantite'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Typo: In word 'especes'
+Typo: In word 'validee'
+Style
+banque_handler.py
+Les chiffres s'écrivent généralement en lettres.
+Vérifiez la concordance de «sortie» avec les noms précédents.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+Le trait d'union est employé sans espaces pour former des mots, alors que le tiret est encadré par des espaces et placé entre deux mots distincts.
+detail_caisse.py
+Les chiffres s'écrivent généralement en lettres.
+Python
+Accessing a protected member of a class or a module
+traiter_dossier.py
+'lister_fichiers_bruts' is not declared in __all__
+'archiver_fichier' is not declared in __all__
+'supprimer_fichier' is not declared in __all__
+'creer_dossier' is not declared in __all__
+An instance attribute is defined outside `__init__`
+transform_view.py
+Instance attribute fenetre_progression defined outside __init__
+Inconsistent return statements
+refactor_audit.py
+'return' without value is inconsistent with other paths
+Incorrect call arguments
+detecteur.py
+Parameter(s) unfilled. Possible callees: read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[True], chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int, *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[False] = ..., chunksize: None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str)
+fichiers.py
+Parameter(s) unfilled. Possible callees: read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[True], chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int, *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[False] = ..., chunksize: None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str)
+generer_fichiers.py
+Unexpected argument
+justification_handler.py
+Parameter(s) unfilled. Possible callees: read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[True], chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int, *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[False] = ..., chunksize: None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str)
+traiter_amex_caisse.py
+Parameter(s) unfilled. Possible callees: read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[True], chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int, *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[False] = ..., chunksize: None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str)
+traiter_ancv.py
+Parameter(s) unfilled. Possible callees: read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[True], chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int, *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: Literal[False] = ..., chunksize: None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str) read_csv(filepath_or_buffer: str | PathLike[str] | ReadCsvBuffer[bytes] | ReadCsvBuffer[str], *, iterator: bool = ..., chunksize: int | None = ..., *, lineterminator: str | None, dialect: str | Dialect | None, nrows: int | None, memory_map: bool, low_memory: bool, usecols: SequenceNotStr[Hashable] | range | ExtensionArray | ndarray[tuple[Any, ...], dtype[Any]] | Index | Series | (HashableT) -> bool | None, engine: Literal["c", "python", "pyarrow", "python-fwf"] | None, delimiter, skipfooter: int, converters: Mapping[Any, (...) -> Any] | None, keep_default_na: bool, parse_dates: bool | Sequence[Hashable] | None, doublequote: bool, on_bad_lines: str, encoding_errors: str | None, cache_dates: bool, sep, storage_options: dict[str, Any] | None, quoting: int, na_values: Hashable | Iterable[Hashable] | Mapping[Hashable, Iterable[Hashable]] | None, float_precision: Literal["high", "legacy", "round_trip"] | None, dtype: ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object] | Mapping[Hashable, ExtensionDtype | str | dtype[Any] | type[str] | type[complex] | type[bool] | type[object]] | None, false_values: list | None, thousands: str | None, encoding: str | None, dayfirst: bool, index_col: Hashable | Sequence[Hashable] | Literal[False] | None, skip_blank_lines: bool, quotechar: str, names, escapechar: str | None, skiprows: list[int] | int | (Hashable) -> bool | None, na_filter: bool, skipinitialspace: bool, dtype_backend, header: int | Sequence[int] | None | Literal["infer"], date_format: str | dict[Hashable, str] | None, comment: str | None, true_values: list | None, compression: Literal["infer", "gzip", "bz2", "zip", "xz", "zstd", "tar"] | dict[str, Any] | None, decimal: str)
+Incorrect type
+alpilink_handler.py
+Expected type 'Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"] | None', got 'str' instead
+Expected type 'tuple[DataFrame, DataFrame] | None', got 'tuple[None, None]' instead
+banque_handler.py
+Expected type 'Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"] | None', got 'str' instead
+Expected type 'Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"] | None', got 'str' instead
+compta_handler.py
+Expected type 'Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"] | None', got 'str' instead
+Expected type 'Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"] | None', got 'str' instead
+detail_caisse.py
+Parameter 'args' unfilled, expected '*tuple[]'
+detecteur.py
+Expected type 'Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"] | None', got 'str' instead
+justification_view.py
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["nw", "n", "ne", "w", "center", "e", "sw", "s", "se"]', got 'str' instead
+Expected type 'Literal["nw", "n", "ne", "w", "center", "e", "sw", "s", "se"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["nw", "n", "ne", "w", "center", "e", "sw", "s", "se"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["nw", "n", "ne", "w", "center", "e", "sw", "s", "se"]', got 'str' instead
+Expected type 'Literal["horizontal", "vertical"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["horizontal", "vertical"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Parameter 'args' unfilled, expected '*tuple[]'
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Parameter 'args' unfilled, expected '*tuple[*_Ts]'
+Parameter 'args' unfilled, expected '*tuple[*_Ts]'
+Parameter 'args' unfilled, expected '*tuple[*_Ts]'
+Expected type 'int | Literal["end"]', got 'str' instead
+Expected type 'int | Literal["end"]', got 'str' instead
+log_viewer.py
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["none", "char", "word"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+main_window.py
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+progression.py
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+refactor_replace.py
+Unexpected type(s): (Any, (...) -> object, str | bytes) Possible type(s): (str | Pattern[str], str | (Match[str]) -> str, str) (bytes | Pattern[bytes], Buffer | (Match[bytes]) -> Buffer, Buffer)
+remise_ui.py
+Expected type 'Literal["nw", "n", "ne", "w", "center", "e", "sw", "s", "se"]', got 'Literal["right"]' instead
+remises.py
+Unexpected type(s): (float | Literal[0] | int | None, int) Possible type(s): (_SupportsRound1[int], None) (_SupportsRound2[float], SupportsIndex)
+stock.py
+Unexpected type(s): (float | None | Literal[0], int) Possible type(s): (_SupportsRound1[int], None) (_SupportsRound2[float], SupportsIndex)
+traiter_alma.py
+Expected type 'int', got 'Hashable' instead
+Expected type 'int', got 'Hashable' instead
+Expected type 'int', got 'Hashable' instead
+Expected type 'int', got 'Hashable' instead
+traiter_dossier.py
+Expected type 'Path', got 'str' instead
+Expected type 'bool', got 'dict' instead
+Expected type 'bool', got 'dict' instead
+Expected type 'bool', got 'dict' instead
+transform_view.py
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["none", "x", "y", "both"]', got 'str' instead
+Expected type 'Literal["left", "right", "top", "bottom"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Expected type 'Literal["normal", "disabled"]', got 'str' instead
+Parameter 'args' unfilled, expected '*tuple[]'
+verification.py
+Expected type 'dict', got 'None' instead
+Expected type 'dict', got 'None' instead
+Expected type 'dict', got 'None' instead
+Method is not declared static
+justification_handler.py
+Method '_lire_fichier' may be 'static'
+Method '_detecter_type' may be 'static'
+Method '_extraire_commandes_banque' may be 'static'
+Method '_extraire_commandes_alpilink' may be 'static'
+Method '_extraire_commandes_compta' may be 'static'
+Method '_exporter' may be 'static'
+main_window.py
+Method '_style' may be 'static'
+refactor_validation_report.py
+Method '' may be 'static'
+traiter_ta.py
+Method 'traiter' may be 'static'
+transform_view.py
+Method 'ouvrir_dossier_sortie' may be 'static'
+PEP 8 naming convention violation
+justification_handler.py
+Variable in function should be lowercase
+Variable in function should be lowercase
+Variable in function should be lowercase
+Variable in function should be lowercase
+Variable in function should be lowercase
+traiter_ta.py
+Variable in function should be lowercase
+Variable in function should be lowercase
+Redeclared names without usages
+colonnes.py
+Redeclared '__all__' defined above without usage
+date.py
+Redeclared '__all__' defined above without usage
+traiter_ancv.py
+Redeclared '__all__' defined above without usage
+Redundant parentheses
+date.py
+Remove redundant parentheses
+Shadowing names from outer scopes
+app.py
+Shadows name 'e' from outer scope
+caisses_ui.py
+Shadows name 'valeur_num' from outer scope
+Shadows name 'var' from outer scope
+Shadows name 'valeur_str' from outer scope
+Shadows name 'valeur_num' from outer scope
+creer_excel_complet.py
+Shadows name 'ws' from outer scope
+Shadows name 'row_num' from outer scope
+dispatcher.py
+Shadows name 'resultat' from outer scope
+Shadows name 'e' from outer scope
+Shadows name 'e' from outer scope
+refactor_audit.py
+Shadows name 'resultats' from outer scope
+Shadows name 'resultats' from outer scope
+Unclear exception clauses
+app.py
+Too broad exception clause
+auto_kiosque.py
+Too broad exception clause
+banque_handler.py
+Too broad exception clause
+caisses_ui.py
+Too broad exception clause
+compta_handler.py
+Too broad exception clause
+dashboard.py
+Too broad exception clause
+Too broad exception clause
+detail_caisse.py
+Too broad exception clause
+Too broad exception clause
+Too broad exception clause
+Too broad exception clause
+Too broad exception clause
+detecteur.py
+Too broad exception clause
+justification_view.py
+Too broad exception clause
+Too broad exception clause
+lecteur_caisse.py
+Too broad exception clause
+log_viewer.py
+Too broad exception clause
+refactor_analyze_handlers.py
+Too broad exception clause
+refactor_check_sources.py
+Too broad exception clause
+refactor_validation_report.py
+Too broad exception clause
+traiter_alma.py
+Too broad exception clause
+traiter_dossier.py
+Too broad exception clause
+Too broad exception clause
+Unresolved references
+dispatcher.py
+Cannot find reference 'traiter_alma' in 'modules.module_1'
+Module 'traiter_alma' not found
+justification_handler.py
+Unresolved attribute reference 'match' for class 'str'
+justification_view.py
+Cannot find reference 'name' in 'list | None'
+test_base_handler.py
+Cannot find reference 'BaseHandler' in 'modules.base_handler'
+Cannot find reference 'ContexteHandler' in 'modules.base_handler'
+Cannot find reference 'StatusHandler' in 'modules.base_handler'
+Unresolved attribute reference 'logs' for class 'ResultatHandler'
+Unresolved attribute reference 'logs' for class 'ResultatHandler'
+Unresolved attribute reference 'to_dict' for class 'ResultatHandler'
+test_checkpoint.py
+Cannot find reference 'utils_colonnes' in 'core'
+Module 'STE_DEFAUT' not found
+Module 'JOURNAUX' not found
+Module 'COLONNES_SORTIE' not found
+Module 'PRO_PARTENAIRES' not found
+Module 'RE_COMMANDE' not found
+Module 'COUPURES_BILLETS' not found
+Module 'COUPURES_PIECES' not found
+Cannot find reference 'utils_format' in 'core'
+Module 'to_float' not found
+Module 'format_montant' not found
+Unresolved reference 'handlers'
+Module 'charger_compta' not found
+Module 'est_compta' not found
+Module 'NotComptaFileError' not found
+Module 'get_remises_en_attente' not found
+test_utils.py
+Cannot find reference 'utils_montant' in 'core'
+Module 'to_float' not found
+Module 'normaliser_cmd' not found
+Module 'extraire_8_chiffres' not found
+Module 'ligne_valide' not found
+Module 'RE_CMD' not found
+Cannot find reference 'utils_format' in 'core'
+Module 'format_montant' not found
+Module 'formater_date' not found
+Module 'date_en_cle' not found
+Module 'normaliser_string' not found
+Cannot find reference 'utils_colonnes' in 'core'
+Module 'JOURNAUX' not found
+Module 'COUPURES_BILLETS' not found
+Module 'COUPURES_PIECES' not found
+Module 'get_journal' not found
+Module 'get_pro_name' not found
+Module 'verifier_colonnes' not found
+Cannot find reference 'utils_fichiers' in 'core'
+Module 'lire_xlsx' not found
+Module 'convertir_xls_en_xlsx' not found
+Module 'lister_fichiers_bruts' not found
+Module 'creer_dossier' not found
+Module 'fichier_existe' not found
+traiter_alma.py
+Unresolved reference 'logger'
+Unresolved reference 'logger'
+traiter_dossier.py
+Cannot find reference 'lister_fichiers_bruts' in 'core.utils.fichiers'
+Cannot find reference 'archiver_fichier' in 'core.utils.fichiers'
+Cannot find reference 'supprimer_fichier' in 'core.utils.fichiers'
+Cannot find reference 'creer_dossier' in 'core.utils.fichiers'
+traiter_planet.py
+Unresolved reference 'pd'
+Unresolved reference 'pd'
+Unresolved reference 'pd'
+Unsatisfied package requirements
+generer_fichiers.py
+Package containing module 'reportlab' is not listed in the project requirements
+Package containing module 'reportlab' is not listed in the project requirements
+Package containing module 'reportlab' is not listed in the project requirements
+Package containing module 'reportlab' is not listed in the project requirements
+Package containing module 'reportlab' is not listed in the project requirements
+traiter_alma.py
+Package containing module 'logger' is not listed in the project requirements
+Unused imports
+alpilink_handler.py
+Unused import statement 'from core.utils.montant import to_float'
+auto_kiosque.py
+Unused import statement 'timedelta'
+Unused import statement 'from modules.module_3.remises import get_historique, ajouter_remise'
+banque_handler.py
+Unused import statement 'from core.utils.montant import to_float'
+Unused import statement 'RE_COMMANDE'
+caisses_ui.py
+Unused import statement 'calculer_total_billets'
+Unused import statement 'calculer_total_pieces'
+compta_handler.py
+Unused import statement 'from core.utils.montant import to_float'
+Unused import statement 'RE_COMMANDE'
+convert_xls.py
+Unused import statement 'import openpyxl'
+creer_excel_complet.py
+Unused import statement ''
+Unused import statement ''
+Unused import statement ''
+detail_caisse.py
+Unused import statement 'messagebox'
+export_core.py
+Unused import statement 'import os'
+export_modules.py
+Unused import statement 'import os'
+export_ui.py
+Unused import statement 'import os'
+generer_fichiers.py
+Unused import statement ''
+Unused import statement ''
+log_viewer.py
+Unused import statement 'from tkinter import ttk'
+refactor_all_handlers.py
+Unused import statement ''
+refactor_analyze_handlers.py
+Unused import statement ''
+Unused import statement ''
+refactor_check_sources.py
+Unused import statement ''
+refactor_replace.py
+Unused import statement ''
+refactor_validation_report.py
+Unused import statement ''
+remise_ui.py
+Unused import statement 'import json'
+Unused import statement 'marquer_remis'
+Unused import statement 'get_stats_remises'
+remises.py
+Unused import statement 'from pathlib import Path'
+Unused import statement 'format_montant'
+traiter_amex_caisse.py
+Unused import statement 'FICHIER_CORRESPONDANCE_AMEX'
+traiter_amex_internet.py
+Unused import statement 'from datetime import datetime, timedelta'
+Unused import statement 'COLONNES_SORTIE'
+traiter_avoirs.py
+Unused import statement 'COLONNES_SORTIE'
+traiter_banque.py
+Unused import statement 'to_float'
+traiter_kiosk_photo.py
+Unused import statement 'COLONNES_SORTIE'
+Unused import statement 'COMPTE_BANQUE'
+traiter_planet.py
+Unused import statement 'import csv'
+Unused import statement 'import openpyxl'
+Unused import statement 'COLONNES_SORTIE'
+traiter_ta.py
+Unused import statement 'from collections import defaultdict'
+Unused import statement 'COLONNES_SORTIE'
+Unused import statement 'from core.moniteur_schema import comparer_schema'
+Unused local symbols
+app.py
+Local variable 'app' value is not used
+caisses_ui.py
+Parameter 'event' value is not used
+detail_caisse.py
+Parameter 'billet' value is not used
+Parameter 'event' value is not used
+justification_view.py
+Parameter 'ecarts' value is not used
+Parameter 'tous_non_valides' value is not used
+traiter_dossier.py
+Local variable 'e' value is not used
+Local variable 'e' value is not used

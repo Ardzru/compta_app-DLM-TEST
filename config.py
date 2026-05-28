@@ -1,17 +1,26 @@
+"""
+Configuration centrale de l'application.
+"""
+
 import sys
 import logging
 from pathlib import Path
 
-# ── Logger bootstrap ──────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# LOGGER BOOTSTRAP
+# ══════════════════════════════════════════════════════════════════════════════
+
 logging.basicConfig(level=logging.DEBUG)
 _log = logging.getLogger("config")
 
 _log.debug("=== CHARGEMENT config.py ===")
 _log.debug(f"sys.frozen     = {getattr(sys, 'frozen', False)}")
 _log.debug(f"sys.executable = {sys.executable}")
-_log.debug(f"__file__       = {__file__}")
 
-# ── BASE_DIR ──────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# BASE_DIR & CHEMINS
+# ══════════════════════════════════════════════════════════════════════════════
+
 if getattr(sys, 'frozen', False):
     BASE_DIR = Path(sys.executable).parent
 else:
@@ -19,22 +28,58 @@ else:
 
 _log.debug(f"BASE_DIR = {BASE_DIR}")
 
-# ── Chemins relatifs à BASE_DIR ───────────────────────────────────────────────
+# Dossiers
 DOSSIER_BRUT          = BASE_DIR / "fichiers_brut"
 DOSSIER_BACKUP        = BASE_DIR / "backup"
 DOSSIER_SORTIE        = BASE_DIR / "sorties" / "fichiers_compta"
 DOSSIER_JUSTIFICATION = BASE_DIR / "sorties" / "justification"
-DOSSIER_SAISIES       = BASE_DIR / "data" / "saisies"          # ← NOUVEAU
+DOSSIER_SAISIES       = BASE_DIR / "data" / "saisies"
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  CAISSES – configuration
-#  ➜ Les saisons et leurs chemins sont désormais dans settings.json
-#    (à la racine du projet, à côté de ce fichier)
-#  ➜ Accès via : from core import settings_manager
-# ─────────────────────────────────────────────────────────────────────────────
+# Créer les dossiers
+for _d in [DOSSIER_BRUT, DOSSIER_BACKUP, DOSSIER_SORTIE, DOSSIER_JUSTIFICATION, DOSSIER_SAISIES]:
+    try:
+        _d.mkdir(parents=True, exist_ok=True)
+        _log.debug(f"✓ Dossier : {_d}")
+    except Exception as e:
+        _log.critical(f"❌ Impossible de créer {_d} : {e}")
+        raise
 
-# Noms des mois en français pour construire le chemin
-# ⚠️ Doit correspondre EXACTEMENT au nom des dossiers sur le réseau
+# ══════════════════════════════════════════════════════════════════════════════
+# LOGGER FICHIER
+# ══════════════════════════════════════════════════════════════════════════════
+
+LOG_FILE = BASE_DIR / "traitement.log"
+
+# Handler fichier
+file_handler = logging.FileHandler(
+    LOG_FILE,
+    encoding="utf-8"
+)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(
+    logging.Formatter("%(asctime)s | %(levelname)s | %(message)s",
+                      datefmt="%d/%m/%Y %H:%M:%S")
+)
+
+# Logger principal
+logger = logging.getLogger("compta")
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
+
+# Ajouter aussi un handler console
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(
+    logging.Formatter("[%(levelname)s] %(message)s")
+)
+logger.addHandler(console_handler)
+
+_log.info(f"Logger fichier : {LOG_FILE}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MOIS & CORRESPONDANCES
+# ══════════════════════════════════════════════════════════════════════════════
+
 CAISSES_MOIS_FR = {
     1:  "01_Janvier",
     2:  "02_Fevrier",
@@ -50,17 +95,8 @@ CAISSES_MOIS_FR = {
     12: "12_Decembre",
 }
 
-# ── Création des dossiers internes ────────────────────────────────────────────
-for _d in [DOSSIER_BRUT, DOSSIER_BACKUP, DOSSIER_SORTIE, DOSSIER_JUSTIFICATION, DOSSIER_SAISIES]:
-    try:
-        _d.mkdir(parents=True, exist_ok=True)
-        _log.debug(f"Dossier OK : {_d}")
-    except Exception as e:
-        _log.critical(f"Impossible de créer {_d} : {e}")
-        raise
-
-# ── Fichier correspondance AMEX ───────────────────────────────────────────────
 def trouver_correspondance_amex() -> Path:
+    """Cherche le fichier de correspondance AMEX."""
     _log.debug("Recherche fichier correspondance_amex...")
     nom  = "correspondance_amex"
     exts = [".csv", ".xlsx", ".xls"]
@@ -68,26 +104,30 @@ def trouver_correspondance_amex() -> Path:
     for dossier in [BASE_DIR, DOSSIER_SORTIE]:
         for ext in exts:
             candidat = dossier / f"{nom}{ext}"
-            _log.debug(f"  Teste : {candidat}")
             if candidat.exists():
-                _log.info(f"Correspondance AMEX trouvée : {candidat}")
+                _log.info(f"✓ Correspondance AMEX trouvée : {candidat}")
                 return candidat
 
     fallback = DOSSIER_SORTIE / f"{nom}.csv"
-    _log.warning(f"Correspondance AMEX introuvable, création fichier vide : {fallback}")
+    _log.warning(f"Correspondance AMEX introuvable : {fallback}")
     fallback.touch()
     return fallback
 
 FICHIER_CORRESPONDANCE_AMEX = trouver_correspondance_amex()
-_log.debug(f"FICHIER_CORRESPONDANCE_AMEX = {FICHIER_CORRESPONDANCE_AMEX}")
 
-# ── Colonnes de sortie ────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# COLONNES DE SORTIE
+# ══════════════════════════════════════════════════════════════════════════════
+
 COLONNES_SORTIE = [
     "STE", "DATE", "COMPTE", "Auxiliaire",
     "n°pièce", "OBJET", "D", "C", "Journal", "Analytique",
 ]
 
-# ── Helpers chemins ───────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# HELPERS CHEMINS
+# ══════════════════════════════════════════════════════════════════════════════
+
 def chemin_sortie(fichier: str) -> Path:
     return DOSSIER_SORTIE / fichier
 
@@ -103,4 +143,8 @@ def chemin_justification(fichier: str) -> Path:
 def chemin_saisie(fichier: str) -> Path:
     return DOSSIER_SAISIES / fichier
 
-_log.debug("=== config.py chargé avec succès ===")
+# ══════════════════════════════════════════════════════════════════════════════
+# FIN
+# ══════════════════════════════════════════════════════════════════════════════
+
+_log.debug("=== config.py CHARGÉ AVEC SUCCÈS ===")

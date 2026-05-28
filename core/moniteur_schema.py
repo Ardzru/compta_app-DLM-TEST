@@ -1,7 +1,7 @@
 # core/moniteur_schema.py
 
 import pandas as pd
-from logger import logger
+from config import logger
 
 # ==========================================================
 # SCHÉMAS ATTENDUS PAR TYPE DE FICHIER

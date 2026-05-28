@@ -1,0 +1,49 @@
+{
+  "especes": {
+    "50": 12,
+    "20": 20,
+    "5": 1,
+    "2": 2,
+    "500": 0,
+    "100": 3
+  },
+  "cheques_vac": {
+    "10": 6
+  },
+  "cheques": [],
+  "ancv": {
+    "total": 0.0
+  },
+  "derniere_maj": "2026-05-28 09:55",
+  "historique": [
+    {
+      "caisse": "kiosque_auto",
+      "date": "27/05/2026",
+      "alimente_le": "2026-05-27 16:40",
+      "ajouts": {}
+    },
+    {
+      "caisse": "kiosque_auto",
+      "date": "28/05/2026",
+      "alimente_le": "2026-05-28 09:15",
+      "ajouts": {}
+    },
+    {
+      "caisse": "67",
+      "date": "27/05/2026",
+      "alimente_le": "2026-05-28 09:55",
+      "ajouts": {}
+    },
+    {
+      "caisse": "67",
+      "date": "27/05/2026",
+      "alimente_le": "2026-05-28 09:55",
+      "ajouts": {
+        "especes_100": "+3",
+        "especes_50": "+1",
+        "especes_20": "+1",
+        "especes_2": "+1"
+      }
+    }
+  ]
+}
