@@ -30,13 +30,60 @@ jobs:
             --collect-all openpyxl `
             --collect-all chardet `
             --collect-all xlrd `
+            --hidden-import dotenv `
+            --hidden-import python-dotenv `
             --hidden-import ui `
             --hidden-import ui.main_window `
             --hidden-import core `
             --hidden-import core.dispatcher `
-            --hidden-import handlers `
-            --hidden-import utils `
+            --hidden-import core.detecteur `
+            --hidden-import core.settings_manager `
+            --hidden-import core.utils.montant `
+            --hidden-import core.utils.fichiers `
+            --hidden-import core.utils.constantes `
+            --hidden-import core.utils.date `
+            --hidden-import core.utils.colonnes `
+            --hidden-import core.utils.commandes `
+            --hidden-import core.database `
+            --hidden-import modules `
+            --hidden-import modules.module_1 `
+            --hidden-import modules.module_1.handlers `
+            --hidden-import modules.module_1.handlers.traiter_alma `
+            --hidden-import modules.module_1.handlers.traiter_amex_caisse `
+            --hidden-import modules.module_1.handlers.traiter_amex_internet `
+            --hidden-import modules.module_1.handlers.traiter_ancv `
+            --hidden-import modules.module_1.handlers.traiter_ancv_banque `
+            --hidden-import modules.module_1.handlers.traiter_avoirs `
+            --hidden-import modules.module_1.handlers.traiter_banque `
+            --hidden-import modules.module_1.handlers.traiter_kiosk_photo `
+            --hidden-import modules.module_1.handlers.traiter_planet_caisse `
+            --hidden-import modules.module_1.handlers.traiter_planet_internet `
+            --hidden-import modules.module_1.handlers.traiter_ta `
+            --hidden-import modules.module_2 `
+            --hidden-import modules.module_2.justification_handler `
+            --hidden-import modules.module_2.handlers `
+            --hidden-import modules.module_2.handlers.alpilink_handler `
+            --hidden-import modules.module_2.handlers.banque_handler `
+            --hidden-import modules.module_2.handlers.compta_handler `
+            --hidden-import modules.module_3 `
+            --hidden-import modules.module_3.lecteur_caisse `
+            --hidden-import modules.module_3.verification `
+            --hidden-import modules.module_3.remises `
+            --hidden-import modules.module_3.stock `
+            --hidden-import modules.module_3.auto_kiosque `
+            --hidden-import modules.module_3.handlers `
+            --hidden-import modules.module_3.handlers.db_caisses `
+            --hidden-import modules.module_3.handlers.db_caisses_especes `
+            --hidden-import modules.module_3.handlers.db_caisses_lignes `
+            --hidden-import modules.module_3.handlers.db_remises `
+            --hidden-import modules.module_3.handlers.db_stock `
+            --hidden-import modules.module_3.handlers.stock_unified `
+            --hidden-import modules.module_3.ui `
+            --hidden-import modules.module_3.ui.caisses_ui `
+            --hidden-import modules.module_3.ui.detail_caisse `
+            --hidden-import modules.module_3.ui.remise_ui `
             app.py
+      
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
