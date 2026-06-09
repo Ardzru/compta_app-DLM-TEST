@@ -1,52 +1,71 @@
-import pandas as pd
+"""
+Module 1 - Handler ANCV
+Logique métier identique à l'original, adaptée au nouveau core.
+"""
+
 from pathlib import Path
 from collections import defaultdict
 from typing import Optional
-from config import DOSSIER_SORTIE
-from config import logger
-from core.utils.montant import to_float, format_montant
-from core.utils.date import formater_date
-from core.utils.colonnes import STE_DEFAUT, JOURNAUX, COLONNES_SORTIE
+import pandas as pd
 
+from config import DOSSIER_SORTIE, logger
+from core.utils.montant import format_montant_compta
+from core.utils.constantes import (
+    STE_DLM,
+    JOURNAL_CEBOOBA,
+    AUXILIAIRE_VIDE,
+    ANALYTIQUE_VIDE,
+    COL_STE, COL_DATE, COL_COMPTE, COL_AUX,
+    COL_PIECE, COL_OBJET, COL_DEBIT, COL_CREDIT,
+    COL_JOURNAL, COL_ANALYTIQUE,
+    COLONNES_SORTIE,
+)
 
 # ==========================================================
-# EXCEPTION MÉTIER
+# COLONNES ATTENDUES DANS LE FICHIER SOURCE
 # ==========================================================
-
-class NotAncvFileError(Exception):
-    """Levée si aucune ligne ANCV exploitable n'est trouvée."""
-    pass
-
-
-# ==========================================================
-# COLONNES ATTENDUES
-# ==========================================================
-COL_ETAT = "EtatANCV"
+COL_ETAT     = "EtatANCV"
 COL_FINALISE = "Transaction Finalisée"
-COL_MONTANT = "CVCo"
-COL_DATE = "Date de création(UTC)"
-COL_REFERENCE = "Order Id"
+COL_MONTANT  = "CVCo"
+COL_DATE_SRC = "Date de création(UTC)"
+COL_REFERENCE= "Order Id"
 
+# Comptes comptables ANCV
+COMPTE_ANCV_INTERNET = "580010DS5"
+COMPTE_ANCV_CAISSE   = "580004"
 
 # ==========================================================
-# UTILITAIRES PRIVÉS
+# UTILITAIRES INTERNES
 # ==========================================================
 
-def _compte_et_piece(reference: str, date: str) -> tuple:
-    """
-    Order Id à 8 chiffres → Internet, sinon Caisse.
+def _nettoyer_montant(val) -> float:
+    try:
+        return float(str(val).replace(",", ".").replace(" ", "").strip())
+    except (ValueError, TypeError):
+        logger.warning(f"[ANCV] Montant invalide ignoré : {val!r}")
+        return 0.0
 
-    Returns:
-        tuple: (compte, piece)
-    """
+
+def _formater_date(val) -> Optional[str]:
+    v = str(val).strip()
+    if not v or v.upper() in ("NAN", "NONE"):
+        return None
+    d = pd.to_datetime(v, dayfirst=True, errors="coerce")
+    if pd.isna(d):
+        logger.warning(f"[ANCV] Date invalide ignorée : {val!r}")
+        return None
+    return d.strftime("%d/%m/%Y")
+
+
+def _compte_et_piece(reference: str, date: str) -> tuple[str, str]:
+    """Order Id à 8 chiffres → Internet, sinon Caisse."""
     ref_clean = str(reference).strip()
     if len(ref_clean) == 8 and ref_clean.isdigit():
-        return "580010DS5", f"ANCV connect Internet du {date}"
-    return "580004", f"ANCV connect Caisse du {date}"
+        return COMPTE_ANCV_INTERNET, f"ANCV connect Internet du {date}"
+    return COMPTE_ANCV_CAISSE, f"ANCV connect Caisse du {date}"
 
 
 def _est_finalise(val) -> bool:
-    """Détecte si une transaction est finalisée."""
     v = str(val).strip().upper()
     if v in ("", "NAN", "FALSE", "NONE"):
         return False
@@ -57,47 +76,36 @@ def _est_finalise(val) -> bool:
 
 
 def _est_validated(val) -> bool:
-    """Détecte si une ligne est validée."""
     v = str(val).strip().upper()
     return v in ("VALIDATED", "TRUE")
 
 
+# ==========================================================
+# CORRECTION DU FICHIER (12 colonnes → 11)
+# ==========================================================
+
 def _corriger_fichier_ancv(fichier: Path) -> pd.DataFrame:
-    """
-    Corrige le fichier ANCV qui a 12 colonnes au lieu de 11.
-    Supprime les `;` finaux et les colonnes vides.
-    """
-    with open(fichier, 'r', encoding='utf-8-sig') as f:
+    """Supprime le point-virgule final parasite de chaque ligne."""
+    with open(fichier, "r", encoding="utf-8-sig") as f:
         lignes = f.readlines()
 
-    # Supprimer le ; final de chaque ligne
     lignes_corrigees = []
     for ligne in lignes:
         ligne = ligne.rstrip()
-        if ligne.endswith(';'):
+        if ligne.endswith(";"):
             ligne = ligne[:-1]
         lignes_corrigees.append(ligne)
 
-    # Écrire dans un fichier temporaire
-    fichier_temp = fichier.with_suffix('.csv.temp')
-    with open(fichier_temp, 'w', encoding='utf-8-sig') as f:
-        f.write('\n'.join(lignes_corrigees))
+    fichier_temp = fichier.with_suffix(".csv.temp")
+    with open(fichier_temp, "w", encoding="utf-8-sig") as f:
+        f.write("\n".join(lignes_corrigees))
 
-    # Lire avec pandas
-    df = pd.read_csv(
-        fichier_temp,
-        sep=';',
-        dtype=str,
-        encoding='utf-8-sig'
-    )
+    df = pd.read_csv(fichier_temp, sep=";", dtype=str, encoding="utf-8-sig")
 
-    # Supprimer la colonne vide créée par le ; final
-    if 'Unnamed: 11' in df.columns:
-        df = df.drop(columns=['Unnamed: 11'])
+    if "Unnamed: 11" in df.columns:
+        df = df.drop(columns=["Unnamed: 11"])
 
-    # Supprimer les lignes vides
-    df = df.dropna(how='all')
-
+    df = df.dropna(how="all")
     fichier_temp.unlink()
     return df
 
@@ -106,106 +114,73 @@ def _corriger_fichier_ancv(fichier: Path) -> pd.DataFrame:
 # HANDLER PRINCIPAL
 # ==========================================================
 
-def traiter_ancv(fichier: Path) -> Optional[Path]:
-    """
-    Traite un fichier ANCV et génère les écritures comptables.
-
-    Règles métier :
-    - Filtrage : VALIDATED + Finalisée + Montant > 0
-    - Groupement par date et compte
-    - Export CSV
-
-    Returns:
-        Path: Chemin du fichier généré, ou None si aucune écriture
-    """
+def traiter_ancv(fichier: Path) -> tuple[str, str]:
     fichier = Path(fichier)
     if not fichier.exists():
         raise FileNotFoundError(f"Fichier ANCV introuvable : {fichier}")
 
-    logger.info(f"Traitement ANCV : {fichier.name}")
+    logger.info(f"[ANCV] Traitement : {fichier.name}")
 
-    # ----------------------------------------------------------
-    # 1. Lecture avec correction du fichier
-    # ----------------------------------------------------------
+    # 1. Lecture + correction
     try:
         df = _corriger_fichier_ancv(fichier)
     except Exception as e:
-        logger.error(f"Échec de la correction du fichier : {e}")
-        raise ValueError(f"Échec de la correction du fichier : {e}")
+        raise ValueError(f"[ANCV] Échec correction fichier : {e}") from e
 
-    # ----------------------------------------------------------
-    # 2. Vérification colonnes requises
-    # ----------------------------------------------------------
-    colonnes_requises = {COL_ETAT, COL_FINALISE, COL_MONTANT,
-                         COL_DATE, COL_REFERENCE}
+    # 2. Vérification colonnes
+    colonnes_requises = {COL_ETAT, COL_FINALISE, COL_MONTANT, COL_DATE_SRC, COL_REFERENCE}
     manquantes = colonnes_requises - set(df.columns)
     if manquantes:
-        logger.error(f"Colonnes manquantes : {manquantes}")
-        raise ValueError(
-            f"Colonnes manquantes dans {fichier.name} : {manquantes}"
-        )
+        raise ValueError(f"[ANCV] Colonnes manquantes : {manquantes}")
 
-    logger.info(f"Colonnes trouvées : {list(df.columns)}")
+    logger.info(f"[ANCV] Colonnes : {list(df.columns)}")
+    logger.info(f"[ANCV] {COL_DATE_SRC} exemples : {df[COL_DATE_SRC].head(3).tolist()}")
+    logger.info(f"[ANCV] {COL_REFERENCE} exemples : {df[COL_REFERENCE].head(3).tolist()}")
+    logger.info(f"[ANCV] {COL_MONTANT} exemples : {df[COL_MONTANT].head(3).tolist()}")
 
-    # ----------------------------------------------------------
-    # 3. Filtrage des lignes
-    # ----------------------------------------------------------
-    df_initial = len(df)
-
-    # Filtrer les lignes validées
+    # 3. Filtrage
     df = df[df[COL_ETAT].apply(_est_validated)]
-    logger.info(f"  Initial       : {df_initial} lignes")
-    logger.info(f"  VALIDATED     : {len(df)} lignes")
+    logger.info(f"[ANCV] VALIDATED : {len(df)}")
 
-    # Filtrer les lignes finalisées
     df = df[df[COL_FINALISE].apply(_est_finalise)]
-    logger.info(f"  Finalisées    : {len(df)} lignes")
+    logger.info(f"[ANCV] Finalisées : {len(df)}")
 
-    # Convertir et filtrer montants > 0
-    df[COL_MONTANT] = df[COL_MONTANT].apply(to_float)
+    df[COL_MONTANT] = df[COL_MONTANT].apply(_nettoyer_montant)
     df = df[df[COL_MONTANT] > 0]
-    logger.info(f"  Montant > 0   : {len(df)} lignes")
+    logger.info(f"[ANCV] Montant > 0 : {len(df)}")
 
     if len(df) == 0:
-        logger.warning(f"⚠️ Aucune ligne valide dans {fichier.name}")
-        raise NotAncvFileError(f"Aucune ligne ANCV exploitable dans {fichier.name}")
+        logger.warning(f"[ANCV] Aucune ligne valide dans {fichier.name}")
+        return "ERREUR", "Aucune ligne valide"
 
-    # ----------------------------------------------------------
     # 4. Groupement par (date, compte)
-    # ----------------------------------------------------------
     groupes = defaultdict(lambda: {"lignes": [], "total": 0.0})
 
-    for idx, row in df.iterrows():
-        date = formater_date(row[COL_DATE])
+    for _, row in df.iterrows():
+        date = _formater_date(row[COL_DATE_SRC])
         if not date:
-            logger.warning(f"Ligne {idx} ignorée : date invalide")
+            logger.warning(f"[ANCV] Ligne ignorée : date invalide ({row[COL_DATE_SRC]!r})")
             continue
 
-        montant = to_float(row[COL_MONTANT])
+        montant   = float(row[COL_MONTANT])
         reference = str(row[COL_REFERENCE]).strip()
-
-        # Déterminer le compte et la pièce
         compte, piece = _compte_et_piece(reference, date)
 
-        # Ajouter la ligne au groupe
         groupes[(date, compte)]["lignes"].append({
-            "STE": STE_DEFAUT,
-            "DATE": date,
-            "COMPTE": compte,
-            "Auxiliaire": "",
-            "n°pièce": piece,
-            "OBJET": reference,
-            "D": "",
-            "C": format_montant(montant),
-            "Journal": JOURNAUX["ancv"],
-            "Analytique": "",
+            COL_STE:        STE_DLM,
+            COL_DATE:       date,
+            COL_COMPTE:     compte,
+            COL_AUX:        AUXILIAIRE_VIDE,
+            COL_PIECE:      piece,
+            COL_OBJET:      reference,
+            COL_DEBIT:      "",
+            COL_CREDIT:     format_montant_compta(montant),  # ex: "150,59"
+            COL_JOURNAL:    JOURNAL_CEBOOBA,
+            COL_ANALYTIQUE: ANALYTIQUE_VIDE,
         })
-
         groupes[(date, compte)]["total"] += montant
 
-    # ----------------------------------------------------------
-    # 5. Génération des lignes finales
-    # ----------------------------------------------------------
+    # 5. Lignes de contrepartie (débit total)
     lignes_finales = []
 
     for (date, compte), groupe in sorted(groupes.items()):
@@ -213,90 +188,39 @@ def traiter_ancv(fichier: Path) -> Optional[Path]:
 
         total = round(groupe["total"], 2)
         if total == 0.0:
-            logger.warning(f"Total nul pour ({date}, {compte}), ligne banque ignorée")
+            logger.warning(f"[ANCV] Total nul pour ({date}, {compte}), ignoré")
             continue
 
-        # Ligne banque (DÉBIT)
         _, piece = _compte_et_piece(
-            "12345678" if compte == "580010DS5" else "X",
+            "12345678" if compte == COMPTE_ANCV_INTERNET else "X",
             date,
         )
 
         lignes_finales.append({
-            "STE": STE_DEFAUT,
-            "DATE": date,
-            "COMPTE": compte,
-            "Auxiliaire": "",
-            "n°pièce": piece,
-            "OBJET": piece,
-            "D": format_montant(total),
-            "C": "",
-            "Journal": JOURNAUX["ancv"],
-            "Analytique": "",
+            COL_STE:        STE_DLM,
+            COL_DATE:       date,
+            COL_COMPTE:     compte,
+            COL_AUX:        AUXILIAIRE_VIDE,
+            COL_PIECE:      piece,
+            COL_OBJET:      piece,
+            COL_DEBIT:      format_montant_compta(total),   # ex: "150,59"
+            COL_CREDIT:     "",
+            COL_JOURNAL:    JOURNAL_CEBOOBA,
+            COL_ANALYTIQUE: ANALYTIQUE_VIDE,
         })
 
-    # ----------------------------------------------------------
     # 6. Export CSV
-    # ----------------------------------------------------------
     if not lignes_finales:
-        logger.warning(f"⚠️ Aucune écriture générée pour {fichier.name}")
-        raise NotAncvFileError(f"Aucune écriture générée pour {fichier.name}")
+        logger.warning(f"[ANCV] Aucune écriture générée pour {fichier.name}")
+        return "ERREUR", "Aucune écriture générée"
 
     DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
-    df_final = pd.DataFrame(lignes_finales)
-    sortie = DOSSIER_SORTIE / f"{fichier.stem}_ancv.csv"
+    df_final = pd.DataFrame(lignes_finales, columns=COLONNES_SORTIE)
+    sortie   = DOSSIER_SORTIE / f"{fichier.stem}_ancv.csv"
+    df_final.to_csv(sortie, sep=";", index=False, encoding="latin-1")
 
-    df_final.to_csv(
-        sortie,
-        sep=";",
-        index=False,
-        encoding="latin-1",
-        columns=COLONNES_SORTIE
-    )
-
-    logger.info(
-        f"✅ Export ANCV : {sortie.name} ({len(lignes_finales)} écritures)"
-    )
-    return sortie
+    logger.info(f"[ANCV] OK {sortie.name} ({len(lignes_finales)} écritures)")
+    return "OK", str(sortie)
 
 
-# ==========================================================
-# CLASSE HANDLER
-# ==========================================================
-
-class TraiterTraiterAncvHandler:
-    """Handler pour traiter les fichiers Traiter Ancv."""
-
-    @staticmethod
-    def traiter(fichier: Path) -> None:
-        """Traite un fichier traiter_ancv."""
-        traiter_ancv(fichier)
-
-    @staticmethod
-    def peut_traiter(detecteur_result: dict) -> bool:
-        """Vérifie si c'est un fichier traiter_ancv."""
-        return detecteur_result.get("type") == "traiter_ancv"
-
-
-__all__ = ['TraiterTraiterAncvHandler', 'traiter_ancv']
-
-
-# ==========================================================
-# CLASSE HANDLER
-# ==========================================================
-
-class TraiterAncvHandler:
-    """Handler pour traiter les fichiers ancv."""
-
-    @staticmethod
-    def traiter(fichier: Path) -> None:
-        """Traite un fichier ancv."""
-        traiter_ancv(fichier)
-
-    @staticmethod
-    def peut_traiter(detecteur_result: dict) -> bool:
-        """Vérifie si c'est un fichier ancv."""
-        return detecteur_result.get("type") == "ancv"
-
-
-__all__ = ['TraiterAncvHandler', 'traiter_ancv']
+__all__ = ["traiter_ancv"]

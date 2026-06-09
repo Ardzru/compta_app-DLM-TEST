@@ -1,211 +1,249 @@
-# handlers/module_2/traiter_amex_internet.py
 """
-Module 2 : Traitement AMEX INTERNET
+Module 1 — Handler AMEX INTERNET
+Traite fichiers AMEX Internet → écritures comptables CSV.
 """
 
 import pandas as pd
 from pathlib import Path
-from typing import Optional
 from collections import defaultdict
-from datetime import datetime, timedelta
+from typing import Tuple
 
 from config import DOSSIER_SORTIE, logger
 
-from core.utils.montant import to_float, format_montant
-from core.utils.date import formater_date
-from core.utils.colonnes import STE_DEFAUT, COLONNES_SORTIE
+# ✅ IMPORTS CORE
+from core.utils.montant import format_montant_compta
+from core.utils.date import formater_date_fr
 from core.utils.constantes import (
+    STE_DLM,
+    JOURNAL_CEBOOBA,
+    COLONNES_SORTIE,
     COMPTE_TRANSIT,
+    COMPTE_FRAIS_AMEX,
     COMPTE_BANQUE,
-    JOURNAUX,
+    ANALYTIQUE_FRAIS,
 )
 
-# ==========================================================
-# EXCEPTION MÉTIER
-# ==========================================================
+# ============================================================
+# CONSTANTES — INDICES COLONNES AMEX INTERNET
+# ============================================================
 
-class NotAmexInternetFileError(Exception):
-    """Levée si aucune ligne AMEX INTERNET exploitable n'est trouvée."""
-    pass
+COL_DATE_LIB = 0  # Date affichée (libellé)
+COL_DATE_COMPTA = 13  # Date comptable
+COL_D = 3  # Montant brut
+COL_E = 4  # Montant crédité / débité
+COL_G = 6  # Frais AMEX
+COL_I = 8  # Montant net
+COL_LIEU = 14  # Nom du lieu (ex: "DLM SITE WEB")
 
-# ==========================================================
-# CONSTANTES COLONNES AMEX INTERNET (SPÉCIFIQUES AU MODULE)
-# ==========================================================
+# ============================================================
+# UTILITAIRES PRIVÉS
+# ============================================================
 
-AMEX_INTERNET_COL = {
-    "date_saisie": 0,
-    "date_compta": 1,
-    "reference": 2,
-    "montant": 3,
-    "motif": 4,
-    "type": 5,
-}
+def _nettoyer_montant(val) -> float:
+    """Nettoie et convertit un montant AMEX en float."""
+    if pd.isna(val):
+        return 0.0
 
-# ==========================================================
+    s = str(val).strip()
+    s = s.replace(" ", "").replace(".", "").replace(",", ".")
+
+    if s.endswith("-"):
+        s = "-" + s[:-1]
+
+    try:
+        return float(s)
+    except ValueError:
+        return 0.0
+
+def _extraire_lieu(val) -> str:
+    """Extrait et nettoie le lieu (colonne 14)."""
+    if pd.isna(val):
+        return ""
+    return str(val).strip().upper()
+
+# ============================================================
 # HANDLER PRINCIPAL
-# ==========================================================
+# ============================================================
 
-def traiter_amex_internet(fichier: Path) -> Optional[Path]:
+def traiter_amex_internet(fichier: Path) -> Tuple[str, str]:
     """
-    Traite un fichier AMEX INTERNET et génère les écritures comptables.
+    Traite un fichier AMEX Internet → écritures comptables CSV.
 
-    Règles métier :
-    - Ventes → COMPTE_TRANSIT (crédit)
-    - Encaissements → COMPTE_BANQUE (débit)
-    - Frais AMEX → COMPTE_FOURN (débit)
-
-    Returns:
-        Path: Chemin du fichier généré
+    Filtre : seules lignes avec "SITE" en colonne 14
+    Génère 3 types d'écritures selon les frais AMEX.
     """
 
     fichier = Path(fichier)
     if not fichier.exists():
-        raise FileNotFoundError(f"Fichier AMEX INTERNET introuvable : {fichier}")
+        msg = f"Fichier AMEX Internet introuvable : {fichier}"
+        logger.error(f"[AMEX_INTERNET] ❌ {msg}")
+        raise FileNotFoundError(msg)
 
-    logger.info(f"Traitement AMEX INTERNET : {fichier.name}")
+    try:
+        df = pd.read_excel(fichier, header=None, engine="openpyxl")
 
-    # ----------------------------------------------------------
-    # 1. Lecture + validation
-    # ----------------------------------------------------------
-    df = pd.read_excel(fichier)
+    except Exception as e:
+        msg = f"Impossible de lire {fichier.name} : {e}"
+        logger.error(f"[AMEX_INTERNET] ❌ {msg}", exc_info=True)
+        return "ERREUR", msg
 
-    if df.empty:
-        logger.error(f"Fichier vide : {fichier.name}")
-        return None
-
-    logger.info(f"Lignes lues : {len(df)}")
-
-    # ----------------------------------------------------------
-    # 2. Regroupement par date comptable
-    # ----------------------------------------------------------
-    groupes: dict = defaultdict(lambda: {
-        "lignes": [],
-        "total_transit": 0.0,
-        "total_banque": 0.0,
-    })
-    nb_ignores = 0
+    # Parcours et accumulation par date comptable
+    groupes: dict = defaultdict(lambda: {"lignes": [], "total_banque": 0.0})
+    lignes_finales = []
+    piece = "AMEX INTERNET"
 
     for idx, row in df.iterrows():
-        try:
-            date_lib = formater_date(row[AMEX_INTERNET_COL["date_saisie"]])
-            date_compta = formater_date(row[AMEX_INTERNET_COL["date_compta"]])
-            reference = str(row[AMEX_INTERNET_COL["reference"]]).strip()
-            montant = to_float(row[AMEX_INTERNET_COL["montant"]])
-            motif = str(row[AMEX_INTERNET_COL["motif"]]).strip().upper()
-            type_txn = str(row[AMEX_INTERNET_COL["type"]]).strip().upper()
+        # ✅ FILTRE SITE — colonne 14
+        lieu = _extraire_lieu(row[COL_LIEU])
 
-            if not date_compta or montant == 0:
-                nb_ignores += 1
-                continue
-
-            piece = f"AMEX-{reference}"
-
-            # ------ CAS 1 — VENTE SANS FRAIS ------
-            if type_txn == "VENTE" and "SANS FRAIS" in motif:
-                groupe = groupes[date_compta]
-
-                # Débit transit, crédit banque
-                groupe["lignes"].append({
-                    "STE": STE_DEFAUT,
-                    "DATE": date_compta,
-                    "COMPTE": COMPTE_TRANSIT,
-                    "Auxiliaire": "",
-                    "n°pièce": piece,
-                    "OBJET": f"AMEX INTERNET DU {date_lib}",
-                    "D": format_montant(montant),
-                    "C": "",
-                    "Journal": JOURNAUX["amex_internet"],
-                    "Analytique": "",
-                })
-
-                groupe["total_banque"] += montant
-
-            # ------ CAS 2 — VENTE AVEC FRAIS ------
-            elif type_txn == "VENTE" and "AVEC FRAIS" in motif:
-                groupe = groupes[date_compta]
-                montant_net = montant
-
-                groupe["lignes"].append({
-                    "STE": STE_DEFAUT,
-                    "DATE": date_compta,
-                    "COMPTE": COMPTE_TRANSIT,
-                    "Auxiliaire": "",
-                    "n°pièce": piece,
-                    "OBJET": f"AMEX INTERNET DU {date_lib}",
-                    "D": "",
-                    "C": format_montant(montant),
-                    "Journal": JOURNAUX["amex_internet"],
-                    "Analytique": "",
-                })
-
-                groupe["total_banque"] += montant_net
-
-        except Exception as e:
-            logger.warning(f"Ligne {idx} ignorée : {str(e)}")
-            nb_ignores += 1
+        if "SITE" not in lieu:
             continue
 
-    logger.info(f"Groupes trouvés : {len(groupes)} | Ignorés : {nb_ignores}")
+        # Dates
+        date_lib = formater_date_fr(row[COL_DATE_LIB])
+        date_compta = formater_date_fr(row[COL_DATE_COMPTA])
 
-    if not groupes:
-        logger.warning(f"Aucune écriture AMEX INTERNET à traiter dans {fichier.name}")
-        return None
+        if not date_lib or not date_compta:
+            continue
 
-    # ----------------------------------------------------------
-    # 3. Génération écritures finales
-    # ----------------------------------------------------------
-    lignes_finales = []
+        # Montants
+        D = _nettoyer_montant(row[COL_D])
+        E = _nettoyer_montant(row[COL_E])
+        G = _nettoyer_montant(row[COL_G])
+        I = _nettoyer_montant(row[COL_I])
 
-    for date_compta, groupe in sorted(groupes.items()):
-        lignes_finales.extend(groupe["lignes"])
+        # Filtre zéro
+        if D == 0 and E == 0 and G == 0 and I == 0:
+            continue
 
-        # Ligne banque
-        if groupe["total_banque"] != 0:
-            lignes_finales.append({
-                "STE": STE_DEFAUT,
+        groupe = groupes[date_compta]
+
+        # ──────────────────────────────────────────────────
+        # CAS 1 — REMBOURSEMENT CLIENT (E < 0, G == 0)
+        # ──────────────────────────────────────────────────
+        if E < 0 and G == 0:
+            montant = abs(E)
+
+            groupe["lignes"].append({
+                "STE": STE_DLM,
                 "DATE": date_compta,
-                "COMPTE": COMPTE_BANQUE,
+                "COMPTE": COMPTE_TRANSIT,
                 "Auxiliaire": "",
-                "n°pièce": f"AMEX-{date_compta.replace('/', '')}",
-                "OBJET": f"Encaissement AMEX INTERNET",
-                "D": format_montant(groupe["total_banque"]),
+                "n°pièce": piece,
+                "OBJET": f"AMEX INTERNET DU {date_lib}",
+                "D": format_montant_compta(montant),
                 "C": "",
-                "Journal": JOURNAUX["amex_internet"],
+                "Journal": JOURNAL_CEBOOBA,
                 "Analytique": "",
             })
 
+            groupe["total_banque"] -= montant
+
+        # ──────────────────────────────────────────────────
+        # CAS 2 — ENCAISSEMENT SIMPLE (E > 0, G == 0)
+        # ──────────────────────────────────────────────────
+        elif E > 0 and G == 0:
+
+            groupe["lignes"].append({
+                "STE": STE_DLM,
+                "DATE": date_compta,
+                "COMPTE": COMPTE_TRANSIT,
+                "Auxiliaire": "",
+                "n°pièce": piece,
+                "OBJET": f"AMEX INTERNET DU {date_lib}",
+                "D": "",
+                "C": format_montant_compta(E),
+                "Journal": JOURNAL_CEBOOBA,
+                "Analytique": "",
+            })
+
+            groupe["total_banque"] += I
+
+        # ──────────────────────────────────────────────────
+        # CAS 3 — ENCAISSEMENT AVEC FRAIS AMEX (G > 0)
+        # ──────────────────────────────────────────────────
+        else:
+
+            groupe["lignes"].append({
+                "STE": STE_DLM,
+                "DATE": date_compta,
+                "COMPTE": COMPTE_TRANSIT,
+                "Auxiliaire": "",
+                "n°pièce": piece,
+                "OBJET": f"AMEX INTERNET DU {date_lib}",
+                "D": "",
+                "C": format_montant_compta(D),
+                "Journal": JOURNAL_CEBOOBA,
+                "Analytique": "",
+            })
+
+            groupe["lignes"].append({
+                "STE": STE_DLM,
+                "DATE": date_compta,
+                "COMPTE": COMPTE_FRAIS_AMEX,
+                "Auxiliaire": "",
+                "n°pièce": piece,
+                "OBJET": f"FRAIS AMEX - {piece}",
+                "D": format_montant_compta(G),
+                "C": "",
+                "Journal": JOURNAL_CEBOOBA,
+                "Analytique": ANALYTIQUE_FRAIS,
+            })
+
+            groupe["total_banque"] += I
+
+    # Génération finale : une ligne banque par date comptable
+    for date_compta, groupe in sorted(groupes.items()):
+
+        lignes_finales.extend(groupe["lignes"])
+
+        total_banque = round(groupe["total_banque"], 2)
+
+        if total_banque == 0.0:
+            continue
+
+        objet_banque = (
+            groupe["lignes"][0]["OBJET"]
+            if groupe["lignes"]
+            else f"AMEX INTERNET DU {date_compta}"
+        )
+
+        lignes_finales.append({
+            "STE": STE_DLM,
+            "DATE": date_compta,
+            "COMPTE": COMPTE_BANQUE,
+            "Auxiliaire": "",
+            "n°pièce": piece,
+            "OBJET": objet_banque,
+            "D": format_montant_compta(total_banque) if total_banque > 0 else "",
+            "C": format_montant_compta(-total_banque) if total_banque < 0 else "",
+            "Journal": JOURNAL_CEBOOBA,
+            "Analytique": "",
+        })
+
+    # Export CSV
     if not lignes_finales:
-        logger.warning(f"Aucune écriture générée pour {fichier.name}")
-        return None
+        msg = f"Aucune écriture générée pour {fichier.name}"
+        return "AUCUNE_DONNEE", msg
 
-    # ----------------------------------------------------------
-    # 4. Export CSV
-    # ----------------------------------------------------------
-    DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
+    try:
+        DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
 
-    df_final = pd.DataFrame(lignes_finales)
-    sortie = DOSSIER_SORTIE / f"{fichier.stem}_amex_internet.csv"
-    df_final.to_csv(sortie, sep=";", index=False, encoding="latin1")
+        df_final = pd.DataFrame(lignes_finales)
+        sortie = DOSSIER_SORTIE / f"{fichier.stem}_amex_internet.csv"
+        df_final.to_csv(
+            sortie,
+            sep=";",
+            index=False,
+            encoding="latin1",
+            columns=COLONNES_SORTIE,
+        )
 
-    logger.info(f"Export AMEX INTERNET : {sortie.name} ({len(lignes_finales)} écritures)")
+        return "OK", str(sortie)
 
-    return sortie
+    except Exception as e:
+        msg = f"Erreur export CSV : {e}"
+        logger.error(f"[AMEX_INTERNET] ❌ {msg}", exc_info=True)
+        return "ERREUR", msg
 
-# ==========================================================
-# CLASSE HANDLER
-# ==========================================================
-
-class TraiterAmexInternetHandler:
-    """Handler pour traiter les fichiers AMEX INTERNET."""
-
-    @staticmethod
-    def traiter(fichier: Path) -> None:
-        """Traite un fichier AMEX INTERNET."""
-        traiter_amex_internet(fichier)
-
-    @staticmethod
-    def peut_traiter(detecteur_result: dict) -> bool:
-        """Vérifie si c'est un fichier AMEX INTERNET."""
-        return detecteur_result.get("type") == "amex_internet"
-
-__all__ = ['TraiterAmexInternetHandler', 'traiter_amex_internet']
+__all__ = ["traiter_amex_internet"]

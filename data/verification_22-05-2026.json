@@ -1,0 +1,206 @@
+{
+  "caisses_verif": {
+    "Caisse 60": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 61": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 62": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 63": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 64": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 65": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 66": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 67": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 68": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 69": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 70": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 71": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 75": {
+      "total_billets": 74.0,
+      "total_pieces": 0.0,
+      "total_especes": 74.0,
+      "validee": true,
+      "date": "22/05/2026",
+      "tous_modes": {
+        "especes_bande": 74.0,
+        "cb_sans_contact": 0.0,
+        "cb_visa": 74.0,
+        "dcc_planet": 0.0,
+        "amex": 0.0,
+        "amex_sans_contact": 0.0,
+        "ancv_connect": 0.0,
+        "cheques_vac_bande": 0.0,
+        "bons_livraisons": 120.0,
+        "cheques_bande": 0.0,
+        "paiement_web": 0.0,
+        "virement": 0.0,
+        "cb_vad": 0.0,
+        "detail_especes": {
+          "500": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "200": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "100": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "50": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "20": {
+            "quantite": 3,
+            "montant": 60
+          },
+          "10": {
+            "quantite": 1,
+            "montant": 10
+          },
+          "5": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "2": {
+            "quantite": 2,
+            "montant": 4
+          },
+          "1": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "0.5": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.2": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.1": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.05": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.02": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.01": {
+            "quantite": 0,
+            "montant": 0.0
+          }
+        },
+        "detail_cheques_vac_coupures": {
+          "50": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "25": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "20": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "10": {
+            "quantite": 0,
+            "montant": 0
+          }
+        },
+        "detail_ancv_connect": [],
+        "detail_cheques": [],
+        "validee": true,
+        "timestamp_validation": "2026-05-26T10:03:41.933197"
+      }
+    }
+  }
+}

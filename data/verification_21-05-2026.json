@@ -1,0 +1,304 @@
+{
+  "caisses_verif": {
+    "Caisse 60": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 61": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 62": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {
+        "especes_bande": 0.0,
+        "cb_sans_contact": 0.0,
+        "cb_visa": 692.0,
+        "dcc_planet": 0.0,
+        "amex": 0.0,
+        "amex_sans_contact": 0.0,
+        "ancv_connect": 0.0,
+        "cheques_vac_bande": 0.0,
+        "bons_livraisons": 0.0,
+        "cheques_bande": 0.0,
+        "paiement_web": 0.0,
+        "virement": 0.0,
+        "cb_vad": 0.0,
+        "detail_especes": {
+          "500": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "200": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "100": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "50": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "20": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "10": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "5": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "2": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "1": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "0.5": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.2": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.1": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.05": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.02": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.01": {
+            "quantite": 0,
+            "montant": 0.0
+          }
+        },
+        "detail_cheques_vac_coupures": {
+          "50": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "25": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "20": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "10": {
+            "quantite": 0,
+            "montant": 0
+          }
+        },
+        "detail_ancv_connect": [],
+        "detail_cheques": [],
+        "validee": true,
+        "timestamp_validation": "2026-05-26T09:07:56.217944"
+      }
+    },
+    "Caisse 63": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 64": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 65": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 66": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 67": {
+      "total_billets": 400.0,
+      "total_pieces": 4.0,
+      "total_especes": 404.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {
+        "especes_bande": 404.0,
+        "cb_sans_contact": 120.0,
+        "cb_visa": 311.0,
+        "dcc_planet": 0.0,
+        "amex": 0.0,
+        "amex_sans_contact": 0.0,
+        "ancv_connect": 0.0,
+        "cheques_vac_bande": 120.0,
+        "bons_livraisons": 981.5,
+        "cheques_bande": 0.0,
+        "paiement_web": 0.0,
+        "virement": 0.0,
+        "cb_vad": 0.0,
+        "detail_especes": {
+          "500": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "200": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "100": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "50": {
+            "quantite": 8,
+            "montant": 400
+          },
+          "20": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "10": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "5": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "2": {
+            "quantite": 2,
+            "montant": 4
+          },
+          "1": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "0.5": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.2": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.1": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.05": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.02": {
+            "quantite": 0,
+            "montant": 0.0
+          },
+          "0.01": {
+            "quantite": 0,
+            "montant": 0.0
+          }
+        },
+        "detail_cheques_vac_coupures": {
+          "50": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "25": {
+            "quantite": 0,
+            "montant": 0
+          },
+          "20": {
+            "quantite": 6,
+            "montant": 120
+          },
+          "10": {
+            "quantite": 0,
+            "montant": 0
+          }
+        },
+        "detail_ancv_connect": [],
+        "detail_cheques": [],
+        "validee": true,
+        "timestamp_validation": "2026-05-26T09:07:45.567127"
+      }
+    },
+    "Caisse 68": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 69": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 70": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 71": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    },
+    "Caisse 75": {
+      "total_billets": 0.0,
+      "total_pieces": 0.0,
+      "total_especes": 0.0,
+      "validee": true,
+      "date": "21/05/2026",
+      "tous_modes": {}
+    }
+  }
+}

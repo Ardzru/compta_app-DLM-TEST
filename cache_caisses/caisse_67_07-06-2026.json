@@ -1,0 +1,24 @@
+{
+  "attendu": {},
+  "saisi": {
+    "especes_bande": 0.0,
+    "cb_sans_contact": 0.0,
+    "cb_visa": 0.0,
+    "dcc_planet": 0.0,
+    "amex": 0.0,
+    "amex_sans_contact": 0.0,
+    "ancv_connect": 0.0,
+    "cheques_vac_bande": 0.0,
+    "bons_livraisons": 0.0,
+    "cheques_bande": 0.0,
+    "paiement_web": 0.0,
+    "virement": 0.0,
+    "cb_vad": 0.0,
+    "detail_especes": {},
+    "detail_cheques_vac_coupures": {},
+    "detail_ancv_connect": [],
+    "detail_cheques": []
+  },
+  "statut": "NON_VALIDEE",
+  "timestamp": "2026-06-09T14:34:22.240295"
+}

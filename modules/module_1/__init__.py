@@ -1,9 +1,12 @@
-﻿# modules/module_1/__init__.py
-
+# modules/module_1/__init__.py
 """
-Module 1 : Transformation fichiers bruts → CSV compta
+Module 1 - Transformation fichiers bruts vers CSV compta.
+
+Ce fichier reste volontairement léger.
+Le dispatcher importe chaque handler directement.
 """
 
-from . import handlers
-
-__all__ = ['handlers']
+__all__ = [
+    "handlers",
+    "ui",
+]

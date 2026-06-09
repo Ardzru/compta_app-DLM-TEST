@@ -1,155 +1,214 @@
-# handlers/module_2/alpilink_handler.py
 """
-Module 2 : Chargement/parsing données Alpilink pour justification
+Module 2 - Handler ALPILINK
+Chargement et extraction des commandes depuis ALPILINK.
 """
 
 import pandas as pd
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Dict
 from config import logger
-from core.utils.montant import to_float
-from core.utils.colonnes import ALPILINK_STATUTS_VALIDES, PRO_PARTENAIRES
+from core.utils.commandes import normaliser_cmd
 
 # ==========================================================
-# EXCEPTION MÉTIER
+# EXCEPTION METIER
 # ==========================================================
 
 class NotAlpilinkFileError(Exception):
-    """Levée si aucune donnée Alpilink exploitable n'est trouvée."""
+    """Levee si aucune donnee ALPILINK exploitable n'est trouvee."""
     pass
 
 # ==========================================================
-# UTILITAIRES PRIVÉS
+# DETECTION COLONNES
+# ==========================================================
+
+def _trouver_colonnes(df: pd.DataFrame) -> dict:
+    """
+    Détecte les colonnes ID_COMMANDE, MONTANT, TYPE dans ALPILINK.
+    """
+    result = {}
+    cols_lower = [str(c).lower() for c in df.columns]
+
+    # ID COMMANDE
+    cmd_idx = None
+    for i, col in enumerate(cols_lower):
+        if any(kw in col for kw in ['id commande', 'commande', 'order id']):
+            cmd_idx = i
+            break
+    if cmd_idx is None:
+        cmd_idx = 17  # Colonne par défaut ALPILINK
+
+    result['commande_idx'] = cmd_idx
+    result['commande_col'] = df.columns[cmd_idx] if cmd_idx < len(df.columns) else "INCONNU"
+
+    # MONTANT
+    montant_idx = None
+    for i, col in enumerate(cols_lower):
+        if any(kw in col for kw in ['prix total', 'montant', 'amount']):
+            montant_idx = i
+            break
+    if montant_idx is None:
+        montant_idx = 24  # Colonne par défaut ALPILINK
+
+    result['montant_idx'] = montant_idx
+    result['montant_col'] = df.columns[montant_idx] if montant_idx < len(df.columns) else "INCONNU"
+
+    # TYPE (optionnel)
+    type_idx = None
+    for i, col in enumerate(cols_lower):
+        if "type" in col:
+            type_idx = i
+            break
+
+    result['type_idx'] = type_idx
+    result['type_col'] = df.columns[type_idx] if type_idx and type_idx < len(df.columns) else None
+
+    logger.debug(
+        f"[AlpilinkHandler] Colonnes détectées : "
+        f"commande={result['commande_col']}, "
+        f"montant={result['montant_col']}, "
+        f"type={result['type_col']}"
+    )
+
+    return result
+
+# ==========================================================
+# CHARGEMENT
 # ==========================================================
 
 def _get_engine(fichier: Path) -> str:
-    """Détecte le moteur pandas selon l'extension."""
-    return "openpyxl" if fichier.suffix.lower() == ".xlsx" else "xlrd"
-
-
-def _get_pro_name(portail_id) -> Optional[str]:
-    """Récupère le nom du partenaire PRO via le numéro de portail."""
-    try:
-        num = int(float(portail_id)) if portail_id else None
-        return PRO_PARTENAIRES.get(num) if num else None
-    except (ValueError, TypeError):
-        return None
-
-# ==========================================================
-# DÉTECTION & CHARGEMENT
-# ==========================================================
-
-def est_alpilink(fichier: Path) -> bool:
-    """Détecte un fichier Alpilink : nom commence par 'data'"""
-    return fichier.stem.lower().startswith("data")
-
+    """Détecte le bon moteur openpyxl/xlrd pour le fichier."""
+    if fichier.suffix.lower() == ".xlsx":
+        return "openpyxl"
+    return "xlrd"
 
 def charger_alpilink(fichier: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Charge un fichier Alpilink et retourne deux DataFrames :
+    Charge un fichier ALPILINK et sépare NORMAL vs BUYCLUB.
 
-    1. df_normal  : commandes Alpilink classiques agrégées par num_commande
-       Colonnes : num_commande | montant_total | statut | est_pro | nom_partenaire
-
-    2. df_buyclub : commandes BuyClub (présence = détection OK)
-       Colonnes : num_commande
-
-    Raises:
-        NotAlpilinkFileError: Si aucune donnée exploitable
+    Retourne:
+        (df_normal, df_buyclub)
     """
     try:
-        engine = _get_engine(fichier)
-        df_raw = pd.read_excel(fichier, header=0, engine=engine, dtype=str)
+        if fichier.suffix.lower() == ".csv":
+            df = pd.read_csv(fichier, sep=";", dtype=str, encoding="utf-8")
+        else:
+            df = pd.read_excel(fichier, engine=_get_engine(fichier), dtype=str)
 
-        logger.info(f"Chargement Alpilink : {fichier.name} ({len(df_raw)} lignes)")
+        logger.info(f"[AlpilinkHandler] Colonnes : {df.columns.tolist()}")
+        logger.debug(f"[AlpilinkHandler] Shape : {df.shape}")
 
-        # Accès par lettre de colonne
-        def col(lettre):
-            idx = ord(lettre.upper()) - ord('A')
-            return df_raw.iloc[:, idx] if idx < len(df_raw.columns) else pd.Series(dtype=str)
+        # Sépare par Type si la colonne existe
+        cols_lower = [str(c).lower() for c in df.columns]
+        type_idx = None
+        for i, col in enumerate(cols_lower):
+            if "type" in col:
+                type_idx = i
+                break
 
-        col_a = col("A").astype(str).str.strip()
-        col_c = col("C").astype(str).str.strip()
-        col_r = col("R").astype(str).str.strip()
-        col_s = col("S").astype(str).str.strip()
-        col_y = col("Y").astype(str).str.strip()
-        col_z = pd.to_numeric(col("Z"), errors="coerce")
+        if type_idx is not None:
+            df_normal = df[df.iloc[:, type_idx].astype(str).str.upper() == "CLASSIQUE"]
+            df_buyclub = df[df.iloc[:, type_idx].astype(str).str.upper() == "BUYCLUB"]
+            logger.debug(f"[AlpilinkHandler] Séparation : {len(df_normal)} Classique, {len(df_buyclub)} BuyClub")
+        else:
+            logger.warning("[AlpilinkHandler] Colonne 'Type' absente, traitement unifié")
+            df_normal = df
+            df_buyclub = pd.DataFrame()
 
-        df_work = pd.DataFrame({
-            "col_a":    col_a,
-            "col_c":    col_c,
-            "col_r":    col_r,
-            "col_s":    col_s,
-            "col_y":    col_y,
-            "montant":  col_z,
-        })
-
-        # ----------------------------------------------------------
-        # Séparation BuyClub
-        # ----------------------------------------------------------
-        mask_buyclub = df_work["col_c"].str.upper().str.contains("SC9972:BUY", na=False)
-        df_buyclub = df_work[mask_buyclub][["col_r"]].rename(columns={"col_r": "num_commande"})
-        df_buyclub = df_buyclub.dropna(subset=["num_commande"])
-
-        logger.info(f"  BuyClub détecté : {len(df_buyclub)} lignes")
-
-        # ----------------------------------------------------------
-        # Alpilink classique — filtrer statuts valides
-        # ----------------------------------------------------------
-        df_normal = df_work[~mask_buyclub].copy()
-        df_normal = df_normal[df_normal["col_y"].isin(ALPILINK_STATUTS_VALIDES)]
-
-        logger.info(f"  Alpilink classique (statut valide) : {len(df_normal)} lignes")
-
-        # Numéro de commande : S si S != "0", sinon R
-        df_normal["num_commande"] = df_normal.apply(
-            lambda row: row["col_s"] if row["col_s"] != "0" else row["col_r"],
-            axis=1
-        )
-        df_normal = df_normal.dropna(subset=["num_commande", "montant"])
-
-        logger.info(f"  Après nettoyage : {len(df_normal)} lignes")
-
-        # ----------------------------------------------------------
-        # Agrégation montants par numéro de commande
-        # ----------------------------------------------------------
-        df_agg = (
-            df_normal.groupby("num_commande", as_index=False)
-            .agg({
-                "montant":    "sum",
-                "col_y":      "first",
-                "col_a":      "first",
-            })
-            .rename(columns={
-                "montant": "montant_total",
-                "col_y":   "statut",
-                "col_a":   "portail_id",
-            })
-        )
-
-        # ----------------------------------------------------------
-        # Détection PRO via colonne A (numéro portail)
-        # ----------------------------------------------------------
-        df_agg["nom_partenaire"] = df_agg["portail_id"].apply(_get_pro_name)
-        df_agg["est_pro"] = df_agg["nom_partenaire"].notna()
-
-        logger.info(
-            f"✅ Alpilink chargé : {len(df_agg)} commandes "
-            f"({df_agg['est_pro'].sum()} PRO)"
-        )
-
-        return df_agg, df_buyclub
+        return df_normal, df_buyclub
 
     except Exception as e:
-        logger.error(f"Erreur lors du chargement Alpilink : {e}")
-        raise NotAlpilinkFileError(f"Erreur Alpilink {fichier.name} : {e}")
+        logger.error(f"[AlpilinkHandler] Erreur chargement {fichier.name}: {e}", exc_info=True)
+        raise NotAlpilinkFileError(str(e))
 
+# ==========================================================
+# EXTRACTION COMMANDES
+# ==========================================================
 
-def traiter_alpilink(fichier: Path) -> Optional[Tuple[pd.DataFrame, pd.DataFrame]]:
+def extraire_commandes_alpilink(df_normal: pd.DataFrame, df_buyclub: pd.DataFrame) -> List[Dict]:
+    """
+    Extrait les commandes des dataframes ALPILINK.
+
+    ✅ Utilise normaliser_cmd() pour validation uniforme
+    """
+    resultat = []
+    error_count = 0
+
+    cols_info = _trouver_colonnes(df_normal)
+
+    # Traite CLASSIQUE
+    for idx, row in df_normal.iterrows():
+        try:
+            cmd_raw = str(row.iloc[cols_info['commande_idx']]).strip()
+            cmd = normaliser_cmd(cmd_raw)  # ✅ NORMALISATION
+
+            if not cmd:
+                continue
+
+            montant = float(str(row.iloc[cols_info['montant_idx']]).replace(",", ".").strip() or 0)
+
+            resultat.append({
+                "commande": cmd,  # ✅ Normalisée
+                "montant": montant,
+                "type": "Classique",
+                "source_alpilink": "normal",
+            })
+
+        except Exception as e:
+            error_count += 1
+            logger.debug(f"[AlpilinkHandler] Erreur ligne NORMAL {idx}: {e}")
+
+    # Traite BUYCLUB
+    if not df_buyclub.empty:
+        for idx, row in df_buyclub.iterrows():
+            try:
+                cmd_raw = str(row.iloc[cols_info['commande_idx']]).strip()
+                cmd = normaliser_cmd(cmd_raw)  # ✅ NORMALISATION
+
+                if not cmd:
+                    continue
+
+                montant = float(str(row.iloc[cols_info['montant_idx']]).replace(",", ".").strip() or 0)
+
+                resultat.append({
+                    "commande": cmd,  # ✅ Normalisée
+                    "montant": montant,
+                    "type": "BuyClub",
+                    "source_alpilink": "buyclub",
+                })
+
+            except Exception as e:
+                error_count += 1
+                logger.debug(f"[AlpilinkHandler] Erreur ligne BUYCLUB {idx}: {e}")
+
+    logger.info(
+        f"[AlpilinkHandler] Extraction : {len(resultat)} commandes | {error_count} erreurs"
+    )
+
+    return resultat
+
+# ==========================================================
+# POINT D'ENTREE
+# ==========================================================
+
+def traiter_alpilink(fichier: Path) -> Optional[List[Dict]]:
     """Point d'entrée pour le dispatcher."""
+    logger.info(f"[MODULE2][START] traiter_alpilink appele : {fichier.name}")
     try:
         df_normal, df_buyclub = charger_alpilink(fichier)
-        return df_normal, df_buyclub
+        result = extraire_commandes_alpilink(df_normal, df_buyclub)
+        logger.info(f"[MODULE2][OK] traiter_alpilink : {len(result)} commandes retournees")
+        return result
     except NotAlpilinkFileError as e:
-        logger.error(f"❌ {e}")
-        return None, None
+        logger.error(f"[MODULE2][FAIL] ❌ {e}")
+        return None
+
+# ==========================================================
+# EXPORTS
+# ==========================================================
+
+__all__ = [
+    "NotAlpilinkFileError",
+    "charger_alpilink",
+    "extraire_commandes_alpilink",
+    "traiter_alpilink",
+]

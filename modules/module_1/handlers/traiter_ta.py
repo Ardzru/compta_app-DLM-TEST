@@ -1,23 +1,30 @@
 """
-Module 2 : Traitement TA pour justification compte internet
+Module 1 - Handler TA
+Traite les fichiers de trésorerie assistée (billetterie/caisse)
+et génère les écritures comptables
 """
 
+from pathlib import Path
 import re
 import pandas as pd
-from pathlib import Path
-from typing import Optional
-from collections import defaultdict
 
-from config import DOSSIER_SORTIE, logger
-
-from core.utils.montant import to_float, format_montant
-from core.utils.date import formater_date
-from core.utils.colonnes import STE_DEFAUT, COLONNES_SORTIE
+from config import DOSSIER_SORTIE
+from config import logger
+from core.utils.montant import format_montant_compta
 from core.utils.constantes import (
+    STE_DLM,
     COMPTE_TRANSIT,
-    JOURNAUX,
+    JOURNAL_VE,
+    ANALYTIQUE_VIDE,
+    COL_STE, COL_DATE, COL_COMPTE, COL_AUX,
+    COL_PIECE, COL_OBJET, COL_DEBIT, COL_CREDIT,
+    COL_JOURNAL, COL_ANALYTIQUE,
+    COLONNES_SORTIE,
+    TA_COL,
+    TA_CAISSES_AUTORISEES,
+    TA_LIBELLES_VENTES,
+    TA_LIBELLES_ANNULATIONS,
 )
-from core.moniteur_schema import comparer_schema
 
 # ==========================================================
 # EXCEPTION MÉTIER
@@ -28,30 +35,24 @@ class NotTAFileError(Exception):
     pass
 
 # ==========================================================
-# CONSTANTES COLONNES TA (SPÉCIFIQUES AU MODULE)
+# COLONNES ATTENDUES (depuis TA_COL du core)
 # ==========================================================
+_COL_DATE     = TA_COL["date"]       # "DATE"
+_COL_COMMANDE = TA_COL["commande"]   # "VALEUR PROMPT"
+_COL_CAISSE   = TA_COL["caisse"]     # "CAISSE"
+_COL_MONTANT  = TA_COL["montant"]    # "MONTANT"
+_COL_LIBELLE  = TA_COL["libelle"]    # "SZNAME"
 
-TA_COLONNES = {
-    "num_commande": "Numéro de commande",
-    "date": "Date",
-    "caisse": "Caisse",
-    "libelle": "Libellé",
-    "montant_ventes": "Montant ventes",
-    "montant_annulations": "Montant annulations",
-}
-
-TA_CAISSES_AUTORISEES = ["72", "73", "77"]
-
-TA_LIBELLES_VENTES = ["VENTE", "VENTE NETTE"]
-TA_LIBELLES_ANNULATIONS = ["ANNULATION", "RETOUR"]
+_COLONNES_REQUISES = [_COL_DATE, _COL_COMMANDE, _COL_CAISSE, _COL_MONTANT, _COL_LIBELLE]
 
 # ==========================================================
-# UTILITAIRES PRIVÉS
+# UTILITAIRES INTERNES
 # ==========================================================
 
-def _nettoyer_commande(val) -> Optional[str]:
+def _nettoyer_commande(val) -> str | None:
     """
     Extrait et normalise le numéro de commande.
+
     - Conserve uniquement les chiffres
     - Nécessite au moins 8 chiffres
     - Retourne les 8 premiers chiffres
@@ -63,222 +64,273 @@ def _nettoyer_commande(val) -> Optional[str]:
         return None
     return "".join(chiffres[:8])
 
+
+def _formater_date(val) -> str | None:
+    """
+    Formate une date au format JJ/MM/AAAA.
+
+    Retourne None si la date est invalide.
+    """
+    try:
+        d = pd.to_datetime(val, errors="coerce")
+        if pd.isna(d):
+            logger.warning(f"[TA] Date invalide ignorée : {val!r}")
+            return None
+        return d.strftime("%d/%m/%Y")
+    except Exception as e:
+        logger.warning(f"[TA] Erreur formatage date {val!r} : {e}")
+        return None
+
+
 def _verifier_colonnes(df: pd.DataFrame, fichier: Path) -> None:
-    """Vérifie que les colonnes attendues sont présentes."""
-    colonnes_requises = list(TA_COLONNES.values())
-    manquantes = [c for c in colonnes_requises if c not in df.columns]
+    """
+    Vérifie que les colonnes attendues sont présentes.
+
+    Lève ValueError si colonnes manquantes.
+    """
+    manquantes = [c for c in _COLONNES_REQUISES if c not in df.columns]
     if manquantes:
-        raise ValueError(
+        msg = (
             f"Colonnes manquantes dans {fichier.name} : {manquantes}\n"
             f"Colonnes trouvées : {list(df.columns)}"
         )
+        logger.error(f"[TA] {msg}")
+        raise ValueError(msg)
 
 # ==========================================================
-# FONCTION PRINCIPALE
+# HANDLER PRINCIPAL
 # ==========================================================
 
-def traiter_ta(fichier: Path) -> Optional[Path]:
+def traiter_ta(fichier: Path) -> tuple[str, str]:
     """
     Traite un fichier TA (billetterie / caisse) et génère
-    les écritures comptables correspondantes pour justification.
+    les écritures comptables correspondantes.
 
     Règles métier :
-    - Seules les caisses 72, 73, 77 sont traitées
-    - Ventes → Débit COMPTE_TRANSIT
-    - Annulations → Crédit COMPTE_TRANSIT
+    - Seules les caisses autorisées (72, 73, 77) sont traitées
+    - Ventes → Débit 580010DS5
+    - Annulations → Crédit 580010DS5
     - Contrepartie par caisse (diff ventes - annulations)
 
-    Args:
-        fichier: Path du fichier TA
-
-    Returns:
-        Path: Chemin du fichier généré ou None
+    Retourne:
+        ("OK", chemin_fichier) | ("ERREUR", message)
     """
 
     fichier = Path(fichier)
     if not fichier.exists():
-        raise FileNotFoundError(f"Fichier TA introuvable : {fichier}")
+        msg = f"Fichier TA introuvable : {fichier}"
+        logger.error(f"[TA] {msg}")
+        return "ERREUR", msg
 
-    logger.info(f"Traitement TA : {fichier.name}")
+    logger.info(f"[MODULE1][TA] Début traitement : {fichier.name}")
 
-    # ----------------------------------------------------------
-    # 1. Lecture + validation schéma
-    # ----------------------------------------------------------
-    df = pd.read_excel(fichier)
-
-    if df.empty:
-        logger.error(f"Fichier vide : {fichier.name}")
-        return None
-
-    _verifier_colonnes(df, fichier)
-    logger.info(f"Colonnes trouvées : {list(df.columns)}")
-
-    # ----------------------------------------------------------
-    # 2. Parcours des lignes
-    # ----------------------------------------------------------
-    commandes: dict = {}  # { num_commande: {"date": str, "D": float, "C": float, "caisse": str, "libelle": str} }
-    nb_ignores = 0
-
-    for idx, row in df.iterrows():
+    try:
+        # ----------------------------------------------------------
+        # 1. Lecture Excel
+        # ----------------------------------------------------------
         try:
-            # Nettoyage commande
-            commande_raw = row[TA_COLONNES["num_commande"]]
-            commande_num = _nettoyer_commande(commande_raw)
-
-            if not commande_num:
-                logger.debug(f"Ligne {idx} ignorée : commande invalide {commande_raw!r}")
-                nb_ignores += 1
-                continue
-
-            # Extraction données
-            date_str = str(row[TA_COLONNES["date"]]).strip()
-            date_compta = formater_date(date_str)
-            if not date_compta:
-                logger.debug(f"Ligne {idx} ignorée : date invalide {date_str!r}")
-                nb_ignores += 1
-                continue
-
-            caisse = str(row[TA_COLONNES["caisse"]]).strip()
-            if caisse not in TA_CAISSES_AUTORISEES:
-                logger.debug(f"Ligne {idx} ignorée : caisse non autorisée {caisse}")
-                nb_ignores += 1
-                continue
-
-            libelle = str(row[TA_COLONNES["libelle"]]).strip().upper()
-            montant_ventes = to_float(row[TA_COLONNES["montant_ventes"]])
-            montant_annuls = to_float(row[TA_COLONNES["montant_annulations"]])
-
-            # Initialiser si première occurrence
-            if commande_num not in commandes:
-                commandes[commande_num] = {
-                    "date": date_compta,
-                    "D": 0.0,
-                    "C": 0.0,
-                    "caisse": caisse,
-                    "libelle": libelle,
-                }
-
-            # Ajouter montants
-            if any(v in libelle for v in TA_LIBELLES_VENTES):
-                commandes[commande_num]["D"] += montant_ventes
-            elif any(a in libelle for a in TA_LIBELLES_ANNULATIONS):
-                commandes[commande_num]["C"] += montant_annuls
-
+            df = pd.read_excel(fichier)
         except Exception as e:
-            logger.warning(f"Ligne {idx} ignorée : {str(e)}")
-            nb_ignores += 1
-            continue
+            msg = f"Impossible de lire {fichier.name} : {e}"
+            logger.error(f"[TA] {msg}")
+            raise NotTAFileError(msg)
 
-    if not commandes:
-        logger.error(f"Aucune ligne exploitable trouvée dans {fichier.name}")
-        raise NotTAFileError(f"Aucune ligne exploitable : {fichier.name}")
+        # ✅ CORRECTION : len(df) au lieu de if df
+        if len(df) == 0:
+            msg = f"Fichier vide : {fichier.name}"
+            logger.warning(f"[TA] {msg}")
+            raise NotTAFileError(msg)
 
-    logger.info(f"Lignes traitées : {len(commandes)} commandes, {nb_ignores} ignorées")
+        # Vérification des colonnes
+        _verifier_colonnes(df, fichier)
 
-    # ----------------------------------------------------------
-    # 3. Construction des écritures
-    # ----------------------------------------------------------
-    lignes_finales = []
-    compte_base = COMPTE_TRANSIT[:-2]  # "580010" (sans "DS5")
+        # ----------------------------------------------------------
+        # 2. Parcours des lignes
+        # ----------------------------------------------------------
+        commandes: dict = {}  # { num_commande: {"date": str, "D": float, "C": float} }
+        caisses: dict = {}    # { caisse: {"ventes": float, "annulations": float} }
+        date_source: str | None = None
+        nb_ignores = 0
 
-    for commande_num, data in sorted(commandes.items()):
-        date_compta = data["date"]
-        D = round(data["D"], 2)
-        C = round(data["C"], 2)
-        caisse = data["caisse"]
+        for idx, row in df.iterrows():
 
-        # Ligne 1 : Compte transit
-        if D != 0.0:
-            lignes_finales.append({
-                "STE": STE_DEFAUT,
-                "DATE": date_compta,
-                "COMPTE": COMPTE_TRANSIT,
-                "Auxiliaire": "",
-                "n°pièce": f"TA-{commande_num}",
-                "OBJET": f"TA {data['libelle']} - Commande {commande_num}",
-                "D": format_montant(D),
-                "C": "",
-                "Journal": JOURNAUX["ta"],
-                "Analytique": "",
-            })
+            # Date de journée = première date valide rencontrée
+            if date_source is None and not pd.isna(row[_COL_DATE]):
+                date_source = _formater_date(row[_COL_DATE])
 
-        # Ligne 2 : Contrepartie par caisse
-        caisse_compte = f"{compte_base}{caisse[-2:]}"
-        solde = round(D - C, 2)
+            # Filtrage caisse
+            caisse = str(row[_COL_CAISSE]).strip() if not pd.isna(row[_COL_CAISSE]) else ""
+            if caisse not in TA_CAISSES_AUTORISEES:
+                logger.debug(f"[TA] Ligne {idx} : caisse non autorisée {caisse!r}")
+                nb_ignores += 1
+                continue
 
-        if solde != 0.0:
-            lignes_finales.append({
-                "STE": STE_DEFAUT,
-                "DATE": date_compta,
-                "COMPTE": caisse_compte,
-                "Auxiliaire": f"CAISSE {caisse}",
-                "n°pièce": f"TA-{commande_num}",
-                "OBJET": f"Contrepartie caisse {caisse}",
-                "D": "" if solde > 0 else format_montant(abs(solde)),
-                "C": format_montant(solde) if solde > 0 else "",
-                "Journal": JOURNAUX["ta"],
-                "Analytique": "",
-            })
+            # Numéro de commande
+            commande = _nettoyer_commande(row[_COL_COMMANDE])
+            if not commande:
+                logger.debug(f"[TA] Ligne {idx} : commande invalide {row[_COL_COMMANDE]!r}")
+                nb_ignores += 1
+                continue
 
-    if not lignes_finales:
-        logger.warning(f"Aucune écriture générée pour {fichier.name}")
-        return None
+            # Montant
+            montant_raw = row[_COL_MONTANT]
+            if pd.isna(montant_raw):
+                logger.debug(f"[TA] Ligne {idx} : montant manquant")
+                nb_ignores += 1
+                continue
 
-    # ----------------------------------------------------------
-    # 4. Export CSV
-    # ----------------------------------------------------------
-    DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
+            try:
+                montant = float(montant_raw)
+            except (ValueError, TypeError):
+                logger.debug(f"[TA] Ligne {idx} : montant invalide {montant_raw!r}")
+                nb_ignores += 1
+                continue
 
-    df_final = pd.DataFrame(lignes_finales)
-    sortie = DOSSIER_SORTIE / f"{fichier.stem}_ta.csv"
-    df_final.to_csv(sortie, sep=";", index=False, encoding="latin1")
+            libelle = str(row[_COL_LIBELLE]).strip() if not pd.isna(row[_COL_LIBELLE]) else ""
 
-    logger.info(f"Export TA : {sortie.name} ({len(lignes_finales)} écritures)")
+            # Initialisation des accumulateurs
+            commandes.setdefault(commande, {"date": date_source, "D": 0.0, "C": 0.0})
+            caisses.setdefault(caisse, {"ventes": 0.0, "annulations": 0.0})
 
-    return sortie
+            # Catégorisation
+            if libelle in TA_LIBELLES_VENTES:
+                commandes[commande]["D"] += montant
+                caisses[caisse]["ventes"] += montant
+
+            elif libelle in TA_LIBELLES_ANNULATIONS:
+                commandes[commande]["C"] += montant
+                caisses[caisse]["annulations"] += montant
+
+            else:
+                logger.debug(f"[TA] Ligne {idx} : libellé non catégorisé {libelle!r}")
+                nb_ignores += 1
+
+        # ----------------------------------------------------------
+        # 3. Vérification
+        # ----------------------------------------------------------
+        if not commandes:
+            msg = f"Aucune ligne TA exploitable dans {fichier.name}"
+            logger.warning(f"[TA] {msg}")
+            raise NotTAFileError(msg)
+
+        if not date_source:
+            msg = f"Impossible de déterminer la date de journée dans {fichier.name}"
+            logger.warning(f"[TA] {msg}")
+            raise NotTAFileError(msg)
+
+        logger.info(
+            f"[TA] Lecture complète : {len(commandes)} commandes, "
+            f"{len(caisses)} caisses, {nb_ignores} lignes ignorées"
+        )
+
+        # ----------------------------------------------------------
+        # 4. Construction des écritures comptables
+        # ----------------------------------------------------------
+        piece = f"JOURNEE DU {date_source}"
+        lignes_finales = []
+        total_debit = 0.0
+        total_credit = 0.0
+
+        # Écritures par commande
+        for commande, data in commandes.items():
+
+            if data["D"] > 0:
+                lignes_finales.append({
+                    COL_STE:        STE_DLM,
+                    COL_DATE:       data["date"],
+                    COL_COMPTE:     COMPTE_TRANSIT,
+                    COL_AUX:        ANALYTIQUE_VIDE,
+                    COL_PIECE:      piece,
+                    COL_OBJET:      commande,
+                    COL_DEBIT:      format_montant_compta(data["D"]),
+                    COL_CREDIT:     "",
+                    COL_JOURNAL:    JOURNAL_VE,
+                    COL_ANALYTIQUE: ANALYTIQUE_VIDE,
+                })
+                total_debit += data["D"]
+
+            if data["C"] > 0:
+                lignes_finales.append({
+                    COL_STE:        STE_DLM,
+                    COL_DATE:       data["date"],
+                    COL_COMPTE:     COMPTE_TRANSIT,
+                    COL_AUX:        ANALYTIQUE_VIDE,
+                    COL_PIECE:      piece,
+                    COL_OBJET:      commande,
+                    COL_DEBIT:      "",
+                    COL_CREDIT:     format_montant_compta(data["C"]),
+                    COL_JOURNAL:    JOURNAL_VE,
+                    COL_ANALYTIQUE: ANALYTIQUE_VIDE,
+                })
+                total_credit += data["C"]
+
+        # Écritures de contrepartie par caisse
+        for caisse, totaux in sorted(caisses.items()):
+
+            diff = totaux["ventes"] - totaux["annulations"]
+
+            if diff == 0:
+                logger.debug(f"[TA] Caisse {caisse} équilibrée, pas de contrepartie")
+                continue
+
+            objet = f"JOURNEE DU {date_source.replace('/', '-')} CAISSE {caisse}"
+
+            if diff > 0:
+                lignes_finales.append({
+                    COL_STE:        STE_DLM,
+                    COL_DATE:       date_source,
+                    COL_COMPTE:     COMPTE_TRANSIT,
+                    COL_AUX:        ANALYTIQUE_VIDE,
+                    COL_PIECE:      piece,
+                    COL_OBJET:      objet,
+                    COL_DEBIT:      "",
+                    COL_CREDIT:     format_montant_compta(diff),
+                    COL_JOURNAL:    JOURNAL_VE,
+                    COL_ANALYTIQUE: ANALYTIQUE_VIDE,
+                })
+                total_credit += diff
+            else:
+                lignes_finales.append({
+                    COL_STE:        STE_DLM,
+                    COL_DATE:       date_source,
+                    COL_COMPTE:     COMPTE_TRANSIT,
+                    COL_AUX:        ANALYTIQUE_VIDE,
+                    COL_PIECE:      piece,
+                    COL_OBJET:      objet,
+                    COL_DEBIT:      format_montant_compta(abs(diff)),
+                    COL_CREDIT:     "",
+                    COL_JOURNAL:    JOURNAL_VE,
+                    COL_ANALYTIQUE: ANALYTIQUE_VIDE,
+                })
+                total_debit += abs(diff)
+
+        # ----------------------------------------------------------
+        # 5. Export CSV
+        # ----------------------------------------------------------
+        DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
+
+        df_final = pd.DataFrame(lignes_finales, columns=COLONNES_SORTIE)
+        sortie = DOSSIER_SORTIE / f"{fichier.stem}_ta.csv"
+        df_final.to_csv(sortie, sep=";", index=False, encoding="latin-1")
+
+        logger.info(
+            f"[MODULE1][TA] Export réussi : {sortie.name} "
+            f"({len(lignes_finales)} écritures, "
+            f"D={format_montant_compta(total_debit)} / "
+            f"C={format_montant_compta(total_credit)})"
+        )
+        return "OK", str(sortie)
+
+    except NotTAFileError as e:
+        msg = str(e)
+        logger.error(f"[TA] {msg}")
+        return "ERREUR", msg
+
+    except Exception as e:
+        msg = f"Erreur de traitement : {e}"
+        logger.error(f"[TA] {msg}", exc_info=True)
+        return "ERREUR", msg
+
 
 # ==========================================================
-# CLASSE HANDLER
-# ==========================================================
-
-class TraiterTaHandler:
-    """Handler pour traiter les fichiers TA."""
-
-    nom = "TraiterTaHandler"
-    description = "Traitement des fichiers TA (billetterie/caisse)"
-
-    def __init__(self):
-        """Initialise le handler TA."""
-        pass
-
-    def traiter(self, fichier: Path) -> Optional[Path]:
-        """
-        Traite un fichier TA.
-
-        Args:
-            fichier: Path du fichier à traiter
-
-        Returns:
-            Path du fichier généré ou None
-        """
-        return traiter_ta(fichier)
-
-    @staticmethod
-    def peut_traiter(detecteur_result: dict) -> bool:
-        """
-        Vérifie si c'est un fichier TA.
-
-        Args:
-            detecteur_result: Résultat du détecteur
-
-        Returns:
-            True si c'est un TA, False sinon
-        """
-        return detecteur_result.get("type") == "ta"
-
-
-# ==========================================================
-# EXPORTS
-# ==========================================================
-
-__all__ = ['TraiterTaHandler', 'traiter_ta', 'NotTAFileError']
+__all__ = ["traiter_ta", "NotTAFileError"]

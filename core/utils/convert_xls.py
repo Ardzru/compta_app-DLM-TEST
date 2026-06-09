@@ -1,7 +1,6 @@
 import pandas as pd
 from pathlib import Path
 import logging
-import openpyxl
 
 logger = logging.getLogger("compta")
 

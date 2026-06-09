@@ -1,12 +1,18 @@
-# core/lecteur_caisse.py
+# modules/module_3/lecteur_caisse.py
+"""
+Lecteur des fichiers caisse XLSM.
+Centralise l'extraction des montants et détails depuis les feuilles de caisse.
+"""
 
 import openpyxl
 from pathlib import Path
 import logging
 import re
 from openpyxl.utils import coordinate_to_tuple
+
 from config import CAISSES_MOIS_FR
 from core import settings_manager
+from core.utils.montant import to_float
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +21,16 @@ logger = logging.getLogger(__name__)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def trouver_dossier_jour(date, chemin_saison: str | None = None) -> str | None:
+    """
+    Trouve le dossier jour correspondant à une date.
+
+    Args:
+        date: Date (datetime.date)
+        chemin_saison: Chemin saison optionnel
+
+    Returns:
+        Chemin du dossier jour ou None si introuvable
+    """
     if chemin_saison is None:
         saison = settings_manager.get_saison_pour_date(date)
         if saison is None:
@@ -25,6 +41,7 @@ def trouver_dossier_jour(date, chemin_saison: str | None = None) -> str | None:
         chemin_saison = saison["chemin"]
 
     mois_str = f"{CAISSES_MOIS_FR[date.month]} {date.year}"
+    # Teste les deux formats : "07" et "7"
     for jour_str in [str(date.day).zfill(2), str(date.day)]:
         chemin = Path(chemin_saison) / mois_str / jour_str
         if chemin.exists():
@@ -36,12 +53,30 @@ def trouver_dossier_jour(date, chemin_saison: str | None = None) -> str | None:
 
 
 def lister_caisses(dossier_jour: str) -> list[str]:
+    """
+    Liste tous les fichiers caisses (.xlsm) d'un dossier jour.
+
+    Args:
+        dossier_jour: Chemin du dossier jour
+
+    Returns:
+        Liste triée des chemins de fichiers caisses
+    """
     fichiers = sorted(Path(dossier_jour).glob("Caisse *.xlsm"))
     logger.debug(f"{len(fichiers)} caisse(s) trouvée(s) dans {dossier_jour}")
     return [str(f) for f in fichiers]
 
 
 def extraire_numero_caisse(chemin_fichier: str) -> str:
+    """
+    Extrait le numéro de caisse depuis le nom du fichier.
+
+    Args:
+        chemin_fichier: Chemin du fichier (ex: "Caisse 01.xlsm")
+
+    Returns:
+        Numéro de caisse (ex: "01")
+    """
     return Path(chemin_fichier).stem.replace("Caisse ", "").strip()
 
 
@@ -50,10 +85,28 @@ def extraire_numero_caisse(chemin_fichier: str) -> str:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def lire_montants_caisse(chemin_fichier: str) -> dict:
+    """
+    Lit un fichier caisse XLSM et extrait tous les montants.
+
+    Args:
+        chemin_fichier: Chemin du fichier XLSM
+
+    Returns:
+        Dict avec structure :
+        {
+            "especes_bande": 123.45,
+            "cb_sans_contact": 45.67,
+            "detail_especes": {500: {"quantite": 2, "montant": 1000}, ...},
+            "detail_cheques_vac": [{"numero": "CHV123", "montant": 50}, ...],
+            ...
+        }
+    """
+    logger.info(f"[MODULE3][LECTEUR] Lecture caisse fichier={chemin_fichier}")
     try:
         wb = openpyxl.load_workbook(chemin_fichier, data_only=True, read_only=True)
         ws = wb.active
 
+        # Construire la grille (row, col) → valeur
         grid = {}
         for row in ws.iter_rows():
             for cell in row:
@@ -61,14 +114,14 @@ def lire_montants_caisse(chemin_fichier: str) -> dict:
                     try:
                         r, c = coordinate_to_tuple(cell.coordinate)
                         grid[(r, c)] = cell.value
-                    except Exception:
+                    except (ValueError, TypeError):
                         pass
 
         wb.close()
         return _parser_montants(grid)
 
-    except Exception as e:
-        logger.error(f"Erreur lecture {chemin_fichier}: {e}")
+    except (OSError, TypeError) as err:
+        logger.error(f"Erreur lecture {chemin_fichier}: {err}")
         return {}
 
 
@@ -77,29 +130,33 @@ def lire_montants_caisse(chemin_fichier: str) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _normaliser(texte) -> str:
+    """Normalise un texte : minuscules, espaces uniques, strip."""
     return re.sub(r'\s+', ' ', str(texte).lower().strip())
 
 
-# SUPPRIMÉ : utiliser from core.utils.montant import to_float
-# SUPPRIMÉ : utiliser from core.utils.montant import to_float
-def to_float(val) -> float | None:
-    if val is None:
-        return None
-    try:
-        return float(str(val).replace(",", ".").replace(" ", "").replace("\xa0", ""))
-    except (ValueError, TypeError):
-        return None
-
-
 def _chercher_label_col1(grid: dict, label: str, col_valeur: int = 3) -> float:
+    """
+    Cherche un label en colonne 1 et retourne la valeur en colonne col_valeur.
+    Fallback sur colonne 2 si col_valeur est vide.
+
+    Args:
+        grid: Grille (row, col) → valeur
+        label: Label à chercher
+        col_valeur: Colonne de la valeur (défaut: 3)
+
+    Returns:
+        Valeur convertie en float, 0.0 si non trouvée
+    """
     label_norm = _normaliser(label)
     for (row, col), val in grid.items():
         if col != 1:
             continue
         if _normaliser(val) == label_norm:
+            # Colonne col_valeur
             v = to_float(grid.get((row, col_valeur)))
             if v is not None and v != 0.0:
                 return v
+            # Fallback colonne 2
             v2 = to_float(grid.get((row, 2)))
             if v2 is not None and v2 != 0.0:
                 return v2
@@ -112,6 +169,15 @@ def _chercher_label_col1(grid: dict, label: str, col_valeur: int = 3) -> float:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _parser_montants(grid: dict) -> dict:
+    """
+    Parse la grille Excel et extrait tous les montants.
+
+    Args:
+        grid: Grille (row, col) → valeur
+
+    Returns:
+        Dict avec tous les montants et détails
+    """
     ch = lambda label: _chercher_label_col1(grid, label, col_valeur=3)
 
     return {
@@ -151,6 +217,7 @@ def _parser_montants(grid: dict) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _lire_surplus_cheques_vac(grid: dict) -> float:
+    """Lit le surplus de chèques vacances."""
     for (row, col), val in grid.items():
         if col == 1 and _normaliser(val) == _normaliser("Surplus Chèques Vacances"):
             for c in range(2, 8):
@@ -162,6 +229,7 @@ def _lire_surplus_cheques_vac(grid: dict) -> float:
 
 
 def _lire_total_especes_compte(grid: dict) -> float:
+    """Lit le total des espèces comptées."""
     for (row, col), val in grid.items():
         if col == 11 and "total" in _normaliser(val) and "esp" in _normaliser(val):
             v = to_float(grid.get((row, 13)))
@@ -171,6 +239,12 @@ def _lire_total_especes_compte(grid: dict) -> float:
 
 
 def _lire_detail_especes(grid: dict) -> dict:
+    """
+    Lit le détail des espèces (billets et pièces).
+
+    Returns:
+        Dict {denomination: {"quantite": int, "montant": float}, ...}
+    """
     valeurs_connues = {500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01}
     result = {}
 
@@ -204,6 +278,12 @@ def _lire_detail_especes(grid: dict) -> dict:
 
 
 def _lire_detail_cheques_vac(grid: dict) -> list[dict]:
+    """
+    Lit le détail des chèques vacances.
+
+    Returns:
+        List [{"numero": str, "montant": float}, ...]
+    """
     result = []
 
     header_row = None
@@ -244,6 +324,9 @@ def _lire_detail_ancv(grid: dict) -> list[dict]:
     """
     Cherche un tableau ANCV Connect dans le fichier.
     Format attendu : date | heure | montant sur colonnes consécutives.
+
+    Returns:
+        List [{"date": str, "heure": str, "montant": float}, ...]
     """
     result = []
 
@@ -285,7 +368,10 @@ def _lire_detail_cheques(grid: dict) -> list[dict]:
     """
     Cherche un tableau Chèques dans le fichier.
     Format attendu : numéro chèque | montant
-    Ignorer les chèques vacances (qui ont leur propre en-tête).
+    Ignore les chèques vacances (qui ont leur propre en-tête).
+
+    Returns:
+        List [{"numero": str, "montant": float}, ...]
     """
     result = []
 
@@ -320,3 +406,11 @@ def _lire_detail_cheques(grid: dict) -> list[dict]:
         })
 
     return result
+
+
+__all__ = [
+    "trouver_dossier_jour",
+    "lister_caisses",
+    "extraire_numero_caisse",
+    "lire_montants_caisse",
+]

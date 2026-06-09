@@ -5,6 +5,10 @@ Configuration centrale de l'application.
 import sys
 import logging
 from pathlib import Path
+import os
+from dotenv import load_dotenv  # type: ignore
+
+load_dotenv()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LOGGER BOOTSTRAP
@@ -99,10 +103,10 @@ def trouver_correspondance_amex() -> Path:
     """Cherche le fichier de correspondance AMEX."""
     _log.debug("Recherche fichier correspondance_amex...")
     nom  = "correspondance_amex"
-    exts = [".csv", ".xlsx", ".xls"]
+    extensions = [".csv", ".xlsx", ".xls"]
 
     for dossier in [BASE_DIR, DOSSIER_SORTIE]:
-        for ext in exts:
+        for ext in extensions:
             candidat = dossier / f"{nom}{ext}"
             if candidat.exists():
                 _log.info(f"✓ Correspondance AMEX trouvée : {candidat}")
@@ -142,6 +146,28 @@ def chemin_justification(fichier: str) -> Path:
 
 def chemin_saisie(fichier: str) -> Path:
     return DOSSIER_SAISIES / fichier
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CONFIGURATION POSTGRESQL
+# ══════════════════════════════════════════════════════════════════════════════
+
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+if not DB_PASSWORD:
+    _log.critical("❌ DB_PASSWORD non défini dans .env")
+    raise ValueError("DB_PASSWORD manquant")
+
+DB_CONFIG = {
+    "host": "docker-01.pleney.local",
+    "database": "compta_app",
+    "user": "compta_app_admin",
+    "password": DB_PASSWORD,
+    "port": 5432
+}
+
+POSTGRES_CONFIG = DB_CONFIG  # Alias pour rétro-compatibilité
+
+_log.info(f"✓ PostgreSQL config chargée : {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIN

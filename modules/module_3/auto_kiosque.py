@@ -1,82 +1,91 @@
 """
-Module 3 - Génération automatique des lignes kiosque
+Module 3 - Generation automatique des lignes kiosque.
 """
-from datetime import datetime, timedelta
-from pathlib import Path
-from modules.module_3.stock import alimenter_depuis_caisse
-from modules.module_3.remises import get_historique, ajouter_remise
-import logging
+
 import json
+from pathlib import Path
+from datetime import datetime, date
+from config import logger
+from .lecteur_caisse import (
+    trouver_dossier_jour,
+    lister_caisses,
+    lire_montants_caisse,
+    extraire_numero_caisse,
+)
+from .stock import alimenter_depuis_caisse
 
-logger = logging.getLogger(__name__)
+KIOSQUE_TRACKER = Path("data/kiosque_tracker.json")
 
-# Fichier de suivi des jours traités
-KIOSQUE_TRACKER = Path(__file__).parent.parent.parent / "data" / "kiosque_tracker.json"
+
+def generer_ligne_kiosque_auto(date_caisse: date = None) -> bool:
+    """
+    Genere automatiquement une ligne kiosque pour le jour.
+    Cree une ligne d'alimentation stock depuis les caisses du jour.
+
+    Args:
+        date_caisse: datetime.date (defaut = aujourd'hui)
+
+    Returns:
+        True si cree, False si deja existant
+    """
+    if date_caisse is None:
+        date_caisse = date.today()
+
+    jour_str = date_caisse.strftime("%Y-%m-%d")
+
+    # Verifier si deja traite
+    tracker = _charger_tracker()
+    if jour_str in tracker:
+        logger.debug(f"[MODULE3][KIOSQUE] {jour_str} deja traite")
+        return False
+
+    # Chercher les caisses du jour
+    dossier_jour = trouver_dossier_jour(date_caisse)
+    if not dossier_jour:
+        logger.warning(f"[MODULE3][KIOSQUE] Aucun dossier pour {jour_str}")
+        return False
+
+    fichiers_caisses = lister_caisses(dossier_jour)
+
+    # Alimenter stock pour chaque caisse
+    for chemin_caisse in fichiers_caisses:
+        numero = extraire_numero_caisse(chemin_caisse)
+        montants = lire_montants_caisse(chemin_caisse)
+
+        alimenter_depuis_caisse(date_caisse, numero, montants.get("montants", {}))
+
+    # Marquer comme traite
+    _marquer_traite(jour_str)
+
+    logger.info(f"[MODULE3][KIOSQUE] Ligne kiosque creee pour {jour_str}")
+    return True
 
 
 def _charger_tracker() -> dict:
-    """Charge le fichier de suivi des jours traités"""
+    """Charge le tracker des jours traites."""
     if KIOSQUE_TRACKER.exists():
         try:
-            with open(KIOSQUE_TRACKER, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return {}
+            return json.loads(KIOSQUE_TRACKER.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            pass
     return {}
 
 
-def _sauvegarder_tracker(tracker: dict) -> None:
-    """Sauvegarde le fichier de suivi"""
-    KIOSQUE_TRACKER.parent.mkdir(parents=True, exist_ok=True)
-    with open(KIOSQUE_TRACKER, 'w', encoding='utf-8') as f:
-        json.dump(tracker, f, ensure_ascii=False, indent=2)
-
-
-def generer_ligne_kiosque_auto(date_str: str = None) -> bool:
-    """
-    Génère une ligne kiosque automatique pour le jour.
-
-    Args:
-        date_str: Date au format JJ/MM/AAAA (default: aujourd'hui)
-
-    Returns:
-        True si généré, False si déjà existant
-    """
-    if date_str is None:
-        date_str = datetime.now().strftime("%d/%m/%Y")
-
+def _marquer_traite(jour_str: str):
+    """Marque un jour comme traite."""
+    KIOSQUE_TRACKER.parent.mkdir(exist_ok=True)
     tracker = _charger_tracker()
-
-    # Vérifie si déjà traité aujourd'hui
-    if tracker.get("derniere_date") == date_str:
-        logger.debug(f"✓ Kiosque auto déjà créé pour {date_str}")
-        return False
+    tracker[jour_str] = datetime.now().isoformat()
 
     try:
-        # Données par défaut (0€ pour les coupures)
-        donnees = {
-            'detail_especes': {},  # vide au départ
-            'detail_cheques_vac_coupures': {},
-            'detail_cheques': [],
-            'ancv_connect': 0.0
-        }
-
-        alimenter_depuis_caisse('kiosque_auto', date_str, donnees)
-
-        # Met à jour le tracker
-        tracker["derniere_date"] = date_str
-        tracker["nb_generees"] = tracker.get("nb_generees", 0) + 1
-        _sauvegarder_tracker(tracker)
-
-        logger.info(f"✅ Ligne kiosque AUTO créée pour {date_str}")
-        return True
-
-    except Exception as e:
-        logger.error(f"❌ Erreur génération kiosque auto: {e}", exc_info=True)
-        return False
+        KIOSQUE_TRACKER.write_text(
+            json.dumps(tracker, indent=2, ensure_ascii=False),
+            encoding="utf-8"
+        )
+    except Exception as exc:
+        logger.error(f"[MODULE3][KIOSQUE] Erreur tracker: {exc}")
 
 
-def reset_tracker_kiosque():
-    """Réinitialise le tracker (pour test)"""
-    KIOSQUE_TRACKER.unlink(missing_ok=True)
-    logger.info("🔄 Tracker kiosque réinitialisé")
+__all__ = [
+    "generer_ligne_kiosque_auto",
+]

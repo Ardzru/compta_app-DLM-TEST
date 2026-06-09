@@ -13,7 +13,8 @@ class ProgressionWindow:
         self.win.grab_set()
 
         frame = ttk.Frame(self.win, padding="15")
-        frame.pack(fill=tk.BOTH, expand=True)
+        frame.pack(fill="both", expand=True)
+
 
         self.label_fichier = ttk.Label(frame, text="Initialisation...", width=50)
         self.label_fichier.pack(pady=5)

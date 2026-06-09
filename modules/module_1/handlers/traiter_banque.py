@@ -1,270 +1,276 @@
+"""
+Module 1 — Handler BANQUE
+Traite fichiers bancaires CSV (format JT_DOMAINE...) → écritures comptables.
+
+Structure réelle du fichier :
+  Ligne TITRE  : [TITRE, nom_société, date_heure, TABLE_V_CUSTOM, ...]
+  Ligne ENTETE : [ENTETE, Date du paiement, Date remise, Commande,
+                  Contrat commerçant, Type, Montant total, Statut]
+  Lignes DATA  : [TRANSACTION, 20260531, 20260603, 14044435,
+                  8430996, DEBIT, 29300, CAPTURED]
+
+Date d'écriture comptable = colonne C (index 2) = Date remise (format AAAAMMJJ)
+"""
+
 import csv
 from pathlib import Path
-from typing import Optional
-from config import DOSSIER_SORTIE
-from config import logger
-from core.utils.montant import to_float, format_montant
-from core.utils.colonnes import STE_DEFAUT, JOURNAUX, CONTRATS_AMEX, COLONNES_SORTIE
 
+import pandas as pd
 
-# ==========================================================
+from config import DOSSIER_SORTIE, logger
+from core.utils.date import formater_date
+from core.utils.montant import format_montant_compta
+from core.utils.constantes import (
+    STE_DLM,
+    JOURNAL_CEBOOBA,
+    COLONNES_SORTIE,
+    COMPTE_TRANSIT,
+    COL_STE,
+    COL_DATE,
+    COL_COMPTE,
+    COL_AUX,
+    COL_PIECE,
+    COL_OBJET,
+    COL_DEBIT,
+    COL_CREDIT,
+    COL_JOURNAL,
+    COL_ANALYTIQUE,
+    CONTRATS_BANQUE,
+)
+
+# ============================================================================
+# INDICES COLONNES
+# [TRANSACTION, date_paiement, date_remise, commande, contrat, type, montant, statut]
+# ============================================================================
+IDX_TYPE        = 0   # TRANSACTION / ENTETE / TITRE
+IDX_DATE_PAIEM  = 1   # Date du paiement  (non utilisée pour l'écriture)
+IDX_DATE_REMISE = 2   # ✅ Date remise AAAAMMJJ → date d'écriture comptable
+IDX_COMMANDE    = 3   # numéro de commande → libellé détail
+IDX_CONTRAT     = 4   # numéro contrat commerçant → CB/AMEX/PLANET
+IDX_SENS        = 5   # DEBIT / CREDIT
+IDX_MONTANT     = 6   # montant en centimes
+IDX_STATUT      = 7   # CAPTURED / REFUSED...
+
+NB_COLS_MIN     = 8
+
+# ============================================================================
 # EXCEPTION MÉTIER
-# ==========================================================
+# ============================================================================
 
 class NotBanqueFileError(Exception):
     """Levée si aucune transaction bancaire exploitable n'est trouvée."""
     pass
 
+# ============================================================================
+# UTILITAIRES INTERNES
+# ============================================================================
 
-# ==========================================================
-# UTILITAIRES PRIVÉS
-# ==========================================================
+def _construire_libelle_contrepartie(cle: str, date_ecriture: str) -> str:
+    """Construit le libellé normalisé pour les lignes de contrepartie."""
+    labels = {
+        "CB":     f"CB DOMAINE DE LOIS {date_ecriture}",
+        "AMEX":   f"AMEX DU {date_ecriture}",
+        "PLANET": f"PLANET DU {date_ecriture}",
+    }
+    return labels.get(cle, f"{cle} DU {date_ecriture}")
 
-def _construire_libelle_banque(cle: str, date_ecriture: str, date_banque_jjmmaa: str) -> str:
-    """Construit le libellé normalisé pour les lignes de contrepartie banque."""
-    if cle == "CB":
-        return f"CB DOMAINE DE LOIS {date_banque_jjmmaa}"
-    elif cle == "AMEX":
-        return f"AMEX DU {date_ecriture}"
-    elif cle == "PLANET":
-        return f"PLANET DU {date_ecriture}"
-    else:
-        return f"{cle} DU {date_ecriture}"
-
-
-def _parser_date_banque(date_c1: str) -> Optional[str]:
-    """
-    Parse la date bancaire depuis le format court YY/MM/DD
-    et retourne la date comptable J-1 au format DD/MM/YYYY.
-    Utilisé pour AMEX et PLANET.
-
-    Exemple : '26/01/09' → '25/01/2009'
-    """
-    try:
-        annee_court, mois, jour = date_c1.split("/")
-        annee = f"20{annee_court}"
-        jour_j1 = f"{int(jour) - 1:02d}"
-        return f"{jour_j1}/{mois}/{annee}"
-    except (ValueError, IndexError):
-        logger.error(f"Date bancaire invalide : {date_c1!r}")
-        return None
-
-
-def _parser_date_banque_jjmmaa(date_c1: str) -> Optional[str]:
-    """
-    Parse la date bancaire depuis le format court YY/MM/DD
-    et retourne la date au format jjmmaa SANS -1 jour.
-    Utilisé pour le libellé CB.
-
-    Exemple : '26/01/09' → '260109'
-    """
-    try:
-        annee_court, mois, jour = date_c1.split("/")
-        return f"{jour}{mois}{annee_court}"
-    except (ValueError, IndexError):
-        logger.error(f"Date bancaire invalide : {date_c1!r}")
-        return None
-
-
-# ==========================================================
+# ============================================================================
 # HANDLER PRINCIPAL
-# ==========================================================
+# ============================================================================
 
-def traiter_banque(fichier: Path) -> Optional[Path]:
+def traiter_banque(fichier: Path) -> tuple[str, str]:
     """
-    Traite un fichier bancaire CSV et génère les écritures comptables.
+    Traite un fichier bancaire CSV (format JT_DOMAINE_DE_LOISIRS...)
+    et génère les écritures comptables.
 
-    Structure de sortie :
-    STE | DATE | COMPTE | Auxiliaire | n°pièce | OBJET | D | C | Journal | Analytique
-
-    Règles métier :
-    - Seules les lignes TRANSACTION + CAPTURED sont traitées
-    - Contrats reconnus : AMEX / PLANET / CB
-    - DEBIT  source = vente        → C (crédit comptable)
-    - CREDIT source = remboursement → D (débit  comptable)
-    - Contrepartie banque : VENTE → D, REMBOURSEMENT → C (2 lignes séparées si besoin)
-    - CB     : date J   (sans -1) dans le libellé
-    - AMEX   : date J-1 dans le libellé
-    - PLANET : date J-1 dans le libellé
+    - Date d'écriture = colonne C (Date remise, format AAAAMMJJ)
+    - Libellé détail  = numéro de commande (colonne D)
+    - Contrepartie    = totaux par type CB/AMEX/PLANET
     """
 
     fichier = Path(fichier)
     if not fichier.exists():
-        raise FileNotFoundError(f"Fichier BANQUE introuvable : {fichier}")
+        msg = f"Fichier BANQUE introuvable : {fichier}"
+        logger.error(f"[BANQUE] {msg}")
+        return "ERREUR", msg
 
-    logger.info(f"Traitement BANQUE : {fichier.name}")
+    try:
+        lignes_detail      = []
+        date_ecriture      = None   # DD/MM/YYYY — pris sur la 1ère TRANSACTION valide
+        nb_ignores         = 0
+        nb_contrat_inconnu = 0
+        contrats_inconnus  = set()
 
-    lignes_detail = []
-    nb_ignores = 0
+        totaux = {
+            cle: {"ventes": 0, "remboursements": 0}
+            for cle in set(CONTRATS_BANQUE.values())
+        }
 
-    # Cumul par contrat en centimes (int) pour éviter les flottants
-    # ventes   = lignes DEBIT  source
-    # rembours = lignes CREDIT source
-    totaux = {cle: {"ventes": 0, "rembours": 0} for cle in CONTRATS_AMEX.values()}
+        with open(fichier, newline="", encoding="latin1") as f:
+            reader = csv.reader(f, delimiter=";")
 
-    with open(fichier, newline="", encoding="latin1") as f:
-        reader = csv.reader(f, delimiter=";")
+            for idx, row in enumerate(reader):
 
-        # ----------------------------------------------------------
-        # 1. Lecture de la première ligne → date bancaire
-        # ----------------------------------------------------------
-        try:
-            premiere_ligne = next(reader)
-            date_raw = premiere_ligne[0].strip()
-            date_ecriture = _parser_date_banque(date_raw)  # J-1 → AMEX / PLANET
-            date_banque_jjmmaa = _parser_date_banque_jjmmaa(date_raw)  # J   → CB libellé
-            piece = premiere_ligne[1].strip() if len(premiere_ligne) > 1 else ""
-        except StopIteration:
-            raise NotBanqueFileError(f"Fichier vide : {fichier.name}")
+                if not row or not row[0].strip():
+                    continue
+
+                type_ligne = row[0].strip().upper()
+
+                # ── Ignorer TITRE et ENTETE ─────────────────────────────
+                if type_ligne in ("TITRE", "ENTETE"):
+                    continue
+
+                # ── Ignorer tout ce qui n'est pas TRANSACTION ───────────
+                if type_ligne != "TRANSACTION":
+                    nb_ignores += 1
+                    continue
+
+                if len(row) < NB_COLS_MIN:
+                    logger.debug(
+                        f"[BANQUE] Ligne {idx} trop courte ({len(row)} cols), ignorée"
+                    )
+                    nb_ignores += 1
+                    continue
+
+                statut      = row[IDX_STATUT].strip().upper()
+                commande    = row[IDX_COMMANDE].strip()
+                contrat_num = row[IDX_CONTRAT].strip()
+                sens        = row[IDX_SENS].strip().upper()
+                montant_str = row[IDX_MONTANT].strip()
+                date_raw    = row[IDX_DATE_REMISE].strip()  # ✅ colonne C
+
+                # ── Filtre statut ───────────────────────────────────────
+                if statut != "CAPTURED":
+                    nb_ignores += 1
+                    continue
+
+                # ── Date d'écriture : on la prend sur la 1ère ligne valide
+                if date_ecriture is None:
+                    date_ecriture = formater_date(date_raw)
+                    if date_ecriture:
+                        logger.debug(f"[BANQUE] Date écriture : {date_ecriture}")
+                    else:
+                        logger.warning(
+                            f"[BANQUE] Date remise illisible ligne {idx} : {date_raw!r}"
+                        )
+
+                # ── Résolution contrat → clé métier ────────────────────
+                cle_contrat = CONTRATS_BANQUE.get(contrat_num)
+                if not cle_contrat:
+                    contrats_inconnus.add(contrat_num)
+                    nb_contrat_inconnu += 1
+                    nb_ignores += 1
+                    continue
+
+                # ── Montant ─────────────────────────────────────────────
+                try:
+                    montant_centimes = int(montant_str)
+                except ValueError:
+                    logger.warning(
+                        f"[BANQUE] Montant invalide ligne {idx} : {montant_str!r}, ignorée"
+                    )
+                    nb_ignores += 1
+                    continue
+
+                montant_eur = montant_centimes / 100
+
+                # ── Sens comptable ──────────────────────────────────────
+                # DEBIT source (vente client) → CREDIT en comptabilité
+                if sens == "DEBIT":
+                    d, c = "", format_montant_compta(montant_eur)
+                    totaux[cle_contrat]["ventes"] += montant_centimes
+                elif sens == "CREDIT":
+                    d, c = format_montant_compta(montant_eur), ""
+                    totaux[cle_contrat]["remboursements"] += montant_centimes
+                else:
+                    logger.warning(
+                        f"[BANQUE] Sens inconnu ligne {idx} : {sens!r}, ignorée"
+                    )
+                    nb_ignores += 1
+                    continue
+
+                # ── Ligne détail ────────────────────────────────────────
+                lignes_detail.append({
+                    COL_OBJET:  commande,
+                    COL_DEBIT:  d,
+                    COL_CREDIT: c,
+                })
+
+        # ── Vérifications post-lecture ──────────────────────────────────
+        if contrats_inconnus:
+            logger.warning(
+                f"[BANQUE] Contrats non reconnus ({nb_contrat_inconnu} lignes) : "
+                f"{contrats_inconnus} — à ajouter dans CONTRATS_BANQUE si nécessaire"
+            )
+
+        if not lignes_detail:
+            raise NotBanqueFileError("Aucune transaction CAPTURED exploitable")
 
         if not date_ecriture:
-            raise NotBanqueFileError(f"Date invalide en première ligne : {fichier.name}")
+            raise NotBanqueFileError(
+                "Date d'écriture introuvable (colonne C vide ou invalide)"
+            )
 
-        # ----------------------------------------------------------
-        # 2. Lecture des lignes de transaction
-        # ----------------------------------------------------------
-        for idx, row in enumerate(reader, start=2):
-            if len(row) < 7:
-                nb_ignores += 1
-                continue
+        # ── Lignes de contrepartie (totaux par type) ────────────────────
+        lignes_contrepartie = []
+        for cle, valeurs in totaux.items():
+            libelle = _construire_libelle_contrepartie(cle, date_ecriture)
 
-            type_ligne = row[0].strip().upper()
-            statut = row[2].strip().upper()
+            if valeurs["ventes"] > 0:
+                lignes_contrepartie.append({
+                    COL_OBJET:  libelle,
+                    COL_DEBIT:  format_montant_compta(valeurs["ventes"] / 100),
+                    COL_CREDIT: "",
+                })
 
-            if type_ligne != "TRANSACTION":
-                nb_ignores += 1
-                continue
+            if valeurs["remboursements"] > 0:
+                lignes_contrepartie.append({
+                    COL_OBJET:  libelle,
+                    COL_DEBIT:  "",
+                    COL_CREDIT: format_montant_compta(valeurs["remboursements"] / 100),
+                })
 
-            if statut != "CAPTURED":
-                logger.debug(f"Ligne {idx} ignorée : statut {statut!r}")
-                nb_ignores += 1
-                continue
+        # ── Construction du DataFrame de sortie ─────────────────────────
+        DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
+        sortie = DOSSIER_SORTIE / f"{fichier.stem}_banque.csv"
+        piece  = f"Encaissement du {date_ecriture}"
 
-            commande = row[3].strip().lstrip("M")
-            contrat = row[4].strip()
-            sens_source = row[5].strip().upper()
-            montant_devise = int(row[6].strip())
-            montant_eur = montant_devise / 100
-
-            # Contrat reconnu ?
-            cle = CONTRATS_AMEX.get(contrat)
-            if not cle:
-                logger.warning(f"Ligne {idx} ignorée : contrat inconnu {contrat!r}")
-                nb_ignores += 1
-                continue
-
-            # --------------------------------------------------
-            # Sens comptable lignes détail :
-            #   DEBIT  source = vente        → C
-            #   CREDIT source = remboursement → D
-            # --------------------------------------------------
-            if sens_source == "DEBIT":
-                d, c = "", format_montant(montant_eur)
-                totaux[cle]["ventes"] += montant_devise
-
-            elif sens_source == "CREDIT":
-                d, c = format_montant(montant_eur), ""
-                totaux[cle]["rembours"] += montant_devise
-
-            else:
-                logger.warning(f"Ligne {idx} ignorée : sens inconnu {sens_source!r}")
-                nb_ignores += 1
-                continue
-
-            lignes_detail.append({
-                "objet": commande,
-                "d": d,
-                "c": c,
+        donnees = []
+        for ligne in lignes_detail + lignes_contrepartie:
+            donnees.append({
+                COL_STE:        STE_DLM,
+                COL_DATE:       date_ecriture,
+                COL_COMPTE:     COMPTE_TRANSIT,
+                COL_AUX:        "",
+                COL_PIECE:      piece,
+                COL_OBJET:      ligne[COL_OBJET],
+                COL_DEBIT:      ligne[COL_DEBIT],
+                COL_CREDIT:     ligne[COL_CREDIT],
+                COL_JOURNAL:    JOURNAL_CEBOOBA,
+                COL_ANALYTIQUE: "",
             })
 
-    # ----------------------------------------------------------
-    # 3. Vérification
-    # ----------------------------------------------------------
-    if not lignes_detail:
-        raise NotBanqueFileError(
-            f"Aucune transaction CAPTURED trouvée dans {fichier.name}"
+        df = pd.DataFrame(donnees, columns=COLONNES_SORTIE)
+        df.to_csv(sortie, sep=";", index=False, encoding="latin-1")
+
+        logger.info(
+            f"[BANQUE] ✅ {len(lignes_detail)} transaction(s) | "
+            f"{nb_ignores} ignorée(s) | date={date_ecriture} → {sortie.name}"
         )
+        return "OK", str(sortie)
 
-    logger.info(
-        f"{len(lignes_detail)} transactions traitées "
-        f"({nb_ignores} lignes ignorées)"
-    )
+    except NotBanqueFileError as e:
+        msg = str(e)
+        logger.warning(f"[BANQUE] {msg}")
+        return "AUCUNE_DONNEE", msg
 
-    # ----------------------------------------------------------
-    # 4. Lignes de contrepartie bancaire
-    #    VENTES         → D (débit)
-    #    REMBOURSEMENTS → C (crédit)
-    #    2 lignes séparées si les deux existent pour un même contrat
-    # ----------------------------------------------------------
-    lignes_via = []
+    except Exception as e:
+        msg = f"Erreur traitement BANQUE : {e}"
+        logger.error(f"[BANQUE] {msg}", exc_info=True)
+        return "ERREUR", msg
 
-    for cle, valeurs in totaux.items():
+# ============================================================================
+# EXPORTS
+# ============================================================================
 
-        total_ventes = valeurs["ventes"]
-        total_rembours = valeurs["rembours"]
-
-        libelle = _construire_libelle_banque(cle, date_ecriture, date_banque_jjmmaa)
-
-        if total_ventes > 0:
-            montant_vente = total_ventes / 100
-            lignes_via.append({
-                "objet": libelle,
-                "d": format_montant(montant_vente),
-                "c": "",
-            })
-            logger.debug(f"Contrepartie VENTE {cle} : {format_montant(montant_vente)} D")
-
-        if total_rembours > 0:
-            montant_remb = total_rembours / 100
-            lignes_via.append({
-                "objet": libelle,
-                "d": "",
-                "c": format_montant(montant_remb),
-            })
-            logger.debug(f"Contrepartie REMBOURSEMENT {cle} : {format_montant(montant_remb)} C")
-
-    # ----------------------------------------------------------
-    # 5. Export CSV
-    # ----------------------------------------------------------
-    DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
-
-    sortie = DOSSIER_SORTIE / f"{fichier.stem}_banque.csv"
-
-    with open(sortie, "w", newline="", encoding="latin1") as f:
-        writer = csv.writer(f, delimiter=";")
-
-        writer.writerow(COLONNES_SORTIE)
-
-        for l in lignes_detail + lignes_via:
-            writer.writerow([
-                STE_DEFAUT, date_ecriture, "580010DS5", "",
-                piece, l["objet"], l["d"], l["c"],
-                JOURNAUX["banque"], "",
-            ])
-
-    logger.info(
-        f"Export BANQUE : {sortie.name} "
-        f"({len(lignes_detail + lignes_via)} écritures)"
-    )
-    return sortie
-
-
-# ==========================================================
-# CLASSE HANDLER
-# ==========================================================
-
-class TraiterBanqueHandler:
-    """Handler pour traiter les fichiers banque."""
-
-    @staticmethod
-    def traiter(fichier: Path) -> None:
-        """Traite un fichier banque."""
-        traiter_banque(fichier)
-
-    @staticmethod
-    def peut_traiter(detecteur_result: dict) -> bool:
-        """Vérifie si c'est un fichier banque."""
-        return detecteur_result.get("type") == "banque"
-
-
-__all__ = ['TraiterBanqueHandler', 'traiter_banque']
+__all__ = ["traiter_banque", "NotBanqueFileError"]

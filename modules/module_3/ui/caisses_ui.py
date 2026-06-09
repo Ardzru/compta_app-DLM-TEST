@@ -1,36 +1,21 @@
-"""
-Module 3 UI - Gestion des caisses
-"""
+# ═══════════════════════════════════════════════════════════════════════════════
+# FILE: modules/module_3/ui/caisses_ui.py — VERSION FINALE CORRIGÉE
+# ═══════════════════════════════════════════════════════════════════════════════
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import date, datetime
 from pathlib import Path
-import logging
+from logging import getLogger
 import csv
 import json
+from modules.module_3.handlers.stock_unified import alimenter_stock_complet
+# ✅ IMPORTS MODULE_3 À LA RACINE
+from modules.module_3 import lecteur_caisse, stock, verification
+from modules.module_3.ui.detail_caisse import DetailCaissePopup
+from modules.module_3.ui.remise_ui import RemiseUI
 
-# ✅ IMPORTS RELATIFS (même dossier ou parent)
-from ..auto_kiosque import generer_ligne_kiosque_auto
-from ..stock import alimenter_depuis_caisse
-from ..verification import (
-    sauvegarder_verification,
-    charger_verification,
-    recalculer_totaux_verification,
-    calculer_total_billets,
-    calculer_total_pieces
-)
-from ..lecteur_caisse import (
-    trouver_dossier_jour,
-    lister_caisses,
-    extraire_numero_caisse,
-    lire_montants_caisse,
-)
-
-# ✅ IMPORTS MÊME NIVEAU (ui/)
-from .detail_caisse import DetailCaissePopup
-from .remise_ui import RemiseUI
-
-logger = logging.getLogger(__name__)
+_log = getLogger("module_3.ui.caisses_ui")
 
 MODES = [
     ("ESPÈCES", "especes_bande"),
@@ -48,51 +33,47 @@ MODES = [
     ("CB VAD", "cb_vad"),
 ]
 
-
 class AppCaisses(tk.Frame):
-    """Gestion des caisses du jour"""
+    """Gestion des caisses du jour."""
 
-    def __init__(self, parent, retour_callback):
+    def __init__(self, parent: tk.Widget, retour_callback) -> None:
         super().__init__(parent, bg="#1e1e2e")
         self.pack(fill="both", expand=True)
+
         self.retour = retour_callback
         self.date_var = tk.StringVar(value=date.today().strftime("%d/%m/%Y"))
         self.caisses_data = {}
         self.caisses_data_original = {}
         self.donnees_corrigees = {}
-        self.tree = None
-        self.lbl_totaux = None
-        self.lbl_statut = None
 
-        # ✅ Génère la ligne auto au chargement
-        try:
-            generer_ligne_kiosque_auto()
-        except Exception as e:
-            logger.warning(f"⚠️ Kiosque auto: {e}")
-
+        _log.debug("[MODULE3][UI] AppCaisses.__init__ appelé")
         self._build_ui()
         self._charger_caisses()
 
-    def _build_ui(self):
-        """Construit l'interface"""
+    # ═══════════════════════════════════════════════════════════════════════════
+    # BUILD UI
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def _build_ui(self) -> None:
+        """Construit l'interface complète."""
         self._build_header()
         self._build_barre_date()
 
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True, padx=12, pady=6)
 
-        # ===== TAB CAISSES =====
+        # Tab 1 : Caisses
         self.tab_caisses = tk.Frame(self.notebook, bg="#1e1e2e")
         self.notebook.add(self.tab_caisses, text="📋 Caisses du jour")
         self._build_tableau_caisses(self.tab_caisses)
 
-        # ===== TAB REMISE =====
+        # Tab 2 : Remises
         tab_remise = tk.Frame(self.notebook, bg="#1e1e2e")
         self.notebook.add(tab_remise, text="🏦 Remises en banque")
         RemiseUI(tab_remise).pack(fill="both", expand=True)
 
-    def _build_header(self):
-        """En-tête avec bouton retour"""
+    def _build_header(self) -> None:
+        """Barre d'en-tête."""
         header = tk.Frame(self, bg="#181825", pady=10)
         header.pack(fill="x")
 
@@ -101,7 +82,7 @@ class AppCaisses(tk.Frame):
             bg="#313244", fg="#cdd6f4",
             font=("Segoe UI", 10), relief="flat",
             padx=10, pady=4,
-            command=self._retour
+            command=self.retour
         ).pack(side="left", padx=12)
 
         tk.Label(
@@ -111,8 +92,8 @@ class AppCaisses(tk.Frame):
             font=("Segoe UI", 16, "bold")
         ).pack(side="left", padx=20)
 
-    def _build_barre_date(self):
-        """Barre de sélection de date et boutons"""
+    def _build_barre_date(self) -> None:
+        """Barre de date et contrôles."""
         barre = tk.Frame(self, bg="#1e1e2e", pady=6)
         barre.pack(fill="x", padx=12)
 
@@ -135,8 +116,9 @@ class AppCaisses(tk.Frame):
             font=("Segoe UI", 10, "bold"),
             relief="flat", padx=10,
             command=self._charger_caisses
-        ).pack(side="left", padx=4)
+        ).pack(side="left")
 
+        # ✅ BOUTON KIOSQUE PHOTO
         tk.Button(
             barre, text="📷 Kiosque Photo",
             bg="#f5c563", fg="#1e1e2e",
@@ -168,77 +150,148 @@ class AppCaisses(tk.Frame):
         )
         self.lbl_statut.pack(side="left", padx=16)
 
-    def _charger_caisses(self):
-        """Charge les caisses du jour"""
-        date_str = self.date_var.get().strip()
+    def _build_tableau_caisses(self, parent: tk.Widget) -> None:
+        """Crée le tableau des caisses."""
+        colonnes = ["Caisse"] + [label for label, _ in MODES] + ["TOTAL"]
+
+        frame_tree = tk.Frame(parent, bg="#1e1e2e")
+        frame_tree.pack(fill="both", expand=True, padx=6, pady=6)
+
+        scroll_y = ttk.Scrollbar(frame_tree, orient="vertical")
+        scroll_x = ttk.Scrollbar(frame_tree, orient="horizontal")
+
+        self.tree = ttk.Treeview(
+            frame_tree,
+            columns=colonnes,
+            height=20,
+            yscrollcommand=scroll_y.set,
+            xscrollcommand=scroll_x.set
+        )
+        self.tree.column("#0", width=0, stretch=False)
+        self.tree.heading("#0", text="")
+
+        for col in colonnes:
+            if col == "Caisse":
+                w = 120
+            elif col == "TOTAL":
+                w = 100
+            else:
+                w = 90
+
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=w, anchor="center", minwidth=70)
+
+        self.tree.tag_configure("pair", background="#313244")
+        self.tree.tag_configure("ok", background="#2a2a3e")
+
+        scroll_y.config(command=self.tree.yview)
+        scroll_x.config(command=self.tree.xview)
+
+        scroll_y.pack(side="right", fill="y")
+        scroll_x.pack(side="bottom", fill="x")
+        self.tree.pack(fill="both", expand=True)
+
+        self.tree.bind("<Double-1>", self._ouvrir_detail)
+
+        self.lbl_totaux = tk.Label(
+            parent, text="",
+            bg="#181825", fg="#f9e2af",
+            font=("Segoe UI", 9),
+            anchor="w", wraplength=1200
+        )
+        self.lbl_totaux.pack(fill="x", padx=8, pady=4)
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # CHARGEMENT / AFFICHAGE
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def _charger_caisses(self) -> None:
+        """Charge les caisses pour la date saisie."""
+        raw = self.date_var.get().strip()
 
         try:
-            jour, mois, annee = map(int, date_str.split('/'))
-            date_obj = date(annee, mois, jour)
-        except Exception as e:
-            messagebox.showerror("❌ Erreur date", f"Format invalide: {e}", parent=self)
+            d = datetime.strptime(raw, "%d/%m/%Y").date()
+        except ValueError:
+            messagebox.showerror("Date invalide", "Format: JJ/MM/AAAA", parent=self)
             return
 
-        try:
-            dossier = trouver_dossier_jour(date_obj)
-            if not dossier:
-                self.lbl_statut.config(text="⚠️ Aucun dossier trouvé pour cette date")
-                self.caisses_data = {}
-                self._afficher_caisses()
-                return
+        _log.debug(f"[MODULE3][UI] _charger_caisses: {raw} → {d}")
 
-            fichiers = lister_caisses(dossier)
-            self.caisses_data = {}
-            self.caisses_data_original = {}
+        # ✅ CORRIGÉ
+        dossier = lecteur_caisse.trouver_dossier_jour(d)
 
-            for fichier in fichiers:
-                try:
-                    num = extraire_numero_caisse(fichier)
-                    montants = lire_montants_caisse(fichier)
-                    self.caisses_data[num] = montants
-                    self.caisses_data_original[num] = montants.copy()
-                except Exception as e:
-                    logger.error(f"Erreur lecture {fichier}: {e}")
-
+        if not dossier:
             self.lbl_statut.config(
-                text=f"✅ {len(self.caisses_data)} caisse(s) chargée(s)"
+                text=f"❌ Dossier introuvable pour {raw}",
+                fg="#f38ba8"
             )
-            self._afficher_caisses()
-
-        except Exception as e:
-            logger.error(f"Erreur chargement: {e}", exc_info=True)
-            messagebox.showerror("❌ Erreur", f"Erreur: {e}", parent=self)
-
-    def _afficher_caisses(self):
-        """Affiche le tableau des caisses"""
-        if not self.tree:
+            self._vider_tableau()
             return
 
-        for item in self.tree.get_children():
-            self.tree.delete(item)
+        # ✅ CORRIGÉ
+        fichiers = lecteur_caisse.lister_caisses(dossier)
 
-        if not self.caisses_data:
-            self.lbl_totaux.config(text="Aucune caisse chargée")
+        if not fichiers:
+            self.lbl_statut.config(text="❌ Aucune caisse trouvée", fg="#f38ba8")
+            self._vider_tableau()
             return
 
-        totaux = {key: 0.0 for label, key in MODES}
+        # Vider et réinitialiser
+        self._vider_tableau()
+        self.caisses_data = {}
+        self.caisses_data_original = {}
+        self.donnees_corrigees = {}
+
+        # Charger chaque caisse
+        for fich in fichiers:
+            try:
+                # ✅ CORRIGÉ
+                num = lecteur_caisse.extraire_numero_caisse(fich)
+                data = lecteur_caisse.lire_montants_caisse(fich)
+                _log.debug(f"[MODULE3][UI] Caisse {num} chargée : {data}")
+
+                self.caisses_data[num] = data.copy()
+                self.caisses_data_original[num] = data.copy()
+                self.donnees_corrigees[num] = {}
+
+            except Exception as err:
+                _log.error(f"[MODULE3][UI] Erreur lecture caisse {fich} : {err}")
+
+        # Remplir le tableau
+        self._remplir_tableau()
+
+        self.lbl_statut.config(
+            text=f"✅ {len(fichiers)} caisse(s) chargée(s)",
+            fg="#a6e3a1"
+        )
+
+    def _vider_tableau(self) -> None:
+        """Vide le tableau."""
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        self.lbl_totaux.config(text="")
+
+    def _remplir_tableau(self) -> None:
+        """Remplit le tableau avec les données."""
+        self._vider_tableau()
+
+        totaux = {k: 0.0 for _, k in MODES}
         total_global = 0.0
 
-        for num in sorted(self.caisses_data.keys()):
-            data = self.caisses_data[num]
+        for i, (num, d_original) in enumerate(sorted(self.caisses_data_original.items())):
+            tag = "pair" if i % 2 == 0 else "ok"
+
             valeurs = []
             ligne_total = 0.0
 
-            for label, key in MODES:
-                val = data.get(key, 0) or 0
-                valeur_float = float(val) if val else 0.0
-                valeurs.append(f"{valeur_float:.2f} €")
-                totaux[key] += valeur_float
-                ligne_total += valeur_float
+            for _, key in MODES:
+                v = d_original.get(key) or 0.0
+                valeurs.append(f"{v:.2f} €" if v else "—")
+                totaux[key] += v
+                ligne_total += v
 
             total_global += ligne_total
 
-            tag = "pair" if int(num) % 2 == 0 else "impair"
             self.tree.insert(
                 "", "end",
                 iid=num,
@@ -256,76 +309,8 @@ class AppCaisses(tk.Frame):
                  f"   ‖   TOTAL : {total_global:.2f} €"
         )
 
-    def _build_tableau_caisses(self, parent):
-        """Construit le tableau des caisses"""
-        colonnes = ["Caisse"] + [label for label, _ in MODES] + ["TOTAL"]
-
-        frame_tree = tk.Frame(parent, bg="#1e1e2e")
-        frame_tree.pack(fill="both", expand=True, padx=6, pady=6)
-
-        scroll_y = ttk.Scrollbar(frame_tree, orient="vertical")
-        scroll_x = ttk.Scrollbar(frame_tree, orient="horizontal")
-
-        self.tree = ttk.Treeview(
-            frame_tree,
-            columns=colonnes,
-            height=15,
-            yscrollcommand=scroll_y.set,
-            xscrollcommand=scroll_x.set
-        )
-
-        scroll_y.config(command=self.tree.yview)
-        scroll_x.config(command=self.tree.xview)
-
-        # ✅ COLONNES AVEC BONS ANCHORS (e = East = droite, w = West = gauche, center)
-        self.tree.column("#0", width=0, stretch=False)
-        self.tree.column("Caisse", anchor="center", width=100)
-        for label, _ in MODES:
-            self.tree.column(label, anchor="e", width=120)
-        self.tree.column("TOTAL", anchor="e", width=120)  # ✅ "e" au lieu de "right"
-
-        self.tree.heading("#0", text="", anchor="center")
-        self.tree.heading("Caisse", text="Caisse", anchor="center")
-        for label, _ in MODES:
-            self.tree.heading(label, text=label, anchor="center")
-        self.tree.heading("TOTAL", text="TOTAL", anchor="center")
-
-        # ===== STYLE =====
-        style = ttk.Style()
-        style.configure(
-            "Treeview",
-            background="#313244",
-            foreground="#cdd6f4",
-            fieldbackground="#313244",
-            font=("Segoe UI", 9)
-        )
-        style.configure(
-            "Treeview.Heading",
-            background="#45475a",
-            foreground="#89b4fa",
-            font=("Segoe UI", 9, "bold")
-        )
-        style.map("Treeview", background=[("selected", "#45475a")])
-
-        self.tree.tag_configure("pair", background="#2a2a3e")
-        self.tree.tag_configure("impair", background="#313244")
-
-        self.tree.pack(fill="both", expand=True, side="left")
-        scroll_y.pack(side="right", fill="y")
-        scroll_x.pack(side="bottom", fill="x")
-
-        self.tree.bind("<Double-1>", self._ouvrir_detail)
-
-        # ===== LABEL DES TOTAUX =====
-        self.lbl_totaux = tk.Label(
-            parent, text="",
-            bg="#1e1e2e", fg="#a6e3a1",
-            font=("Segoe UI", 9, "bold"), wraplength=1200, justify="left"
-        )
-        self.lbl_totaux.pack(fill="x", padx=6, pady=6)
-
-    def _ouvrir_detail(self, event):
-        """Ouvre la popup de détail pour une caisse"""
+    def _ouvrir_detail(self, event: tk.Event) -> None:
+        """Ouvre le détail d'une caisse."""
         sel = self.tree.selection()
         if not sel:
             return
@@ -341,222 +326,292 @@ class AppCaisses(tk.Frame):
             self._actualiser_caisse
         )
 
-    def _actualiser_caisse(self, num_caisse, donnees_modifiees):
-        """Callback pour actualiser une caisse et alimenter le stock"""
+    def _actualiser_caisse(self, num_caisse: str, donnees_modifiees: dict) -> None:
+        """Actualise une caisse modifiée."""
         self.donnees_corrigees[num_caisse] = donnees_modifiees
-        logger.info(f"Caisse {num_caisse} mise à jour : {donnees_modifiees}")
+        _log.info(f"[MODULE3][UI] Caisse {num_caisse} modifiée")
 
-        # ✅ SAUVEGARDER LA VÉRIFICATION
-        verif_data = {
-            'caisses_verif': {
-                f'Caisse {num_caisse}': donnees_modifiees
+        # ✅ CORRIGÉ
+        verification.sauvegarder_verification(
+            self.date_var.get(),
+            {
+                'caisses_verif': {
+                    f'Caisse {num_caisse}': donnees_modifiees
+                }
             }
-        }
-        sauvegarder_verification(self.date_var.get(), verif_data)
+        )
 
-        # ✅ ALIMENTER LE STOCK
-        try:
-            alimenter_depuis_caisse(
-                num_caisse,
-                self.date_var.get(),
-                donnees_modifiees
-            )
-            logger.info(f"✅ Stock alimenté depuis caisse {num_caisse}")
-        except Exception as e:
-            logger.error(f"❌ Erreur alimentation stock caisse {num_caisse}: {e}", exc_info=True)
-            messagebox.showerror(
-                "❌ Erreur Stock",
-                f"Impossible d'alimenter le stock:\n{e}",
-                parent=self
-            )
+        # Alimenter le stock
+        if donnees_modifiees.get("validee"):
+            try:
+                # ✅ CORRIGÉ
+                alimenter_stock_complet(
+                    num_caisse,
+                    self.date_var.get(),
+                    donnees_modifiees
+                )
+                _log.info(f"[MODULE3][UI] Stock alimenté depuis caisse {num_caisse}")
+            except Exception as err:
+                _log.error(f"[MODULE3][UI] Erreur stock : {err}")
 
-        self._afficher_caisses()
+    # ═══════════════════════════════════════════════════════════════════════════
+    # KIOSQUE PHOTO
+    # ═══════════════════════════════════════════════════════════════════════════
 
-    def _popup_kiosque(self):
-        """Popup de saisie du kiosque photo"""
+    def _popup_kiosque(self) -> None:
+        """Pop-up pour le kiosque photo."""
         popup = tk.Toplevel(self)
         popup.title("📷 Kiosque Photo")
-        popup.configure(bg="#1e1e2e")
-        popup.geometry("600x500")
-        popup.resizable(False, True)
-
-        date_str = self.date_var.get()
-
-        tk.Label(
-            popup, text="📷 Saisie Kiosque Photo",
-            bg="#1e1e2e", fg="#cba6f7",
-            font=("Segoe UI", 14, "bold")
-        ).pack(pady=15)
-
-        # ===== COUPURES ESPÈCES =====
-        frame_coupures = tk.LabelFrame(
-            popup, text="Coupures",
-            bg="#1e1e2e", fg="#cdd6f4",
-            font=("Segoe UI", 10, "bold")
-        )
-        frame_coupures.pack(fill="x", padx=20, pady=10)
+        popup.geometry("700x750")
+        popup.resizable(False, False)
+        popup.grab_set()
+        popup.transient(self)
 
         coupures = [
-            ("50€", 50), ("20€", 20), ("10€", 10),
-            ("5€", 5), ("2€", 2), ("1€", 1),
-            ("50¢", 0.5), ("20¢", 0.2), ("10¢", 0.1),
-            ("5¢", 0.05), ("2¢", 0.02), ("1¢", 0.01)
+            ("500.00 €", 500),
+            ("200.00 €", 200),
+            ("100.00 €", 100),
+            ("50.00 €", 50),
+            ("20.00 €", 20),
+            ("10.00 €", 10),
+            ("5.00 €", 5),
+            ("2.00 €", 2),
+            ("1.00 €", 1),
+            ("0.50 €", 0.50),
+            ("0.20 €", 0.20),
+            ("0.10 €", 0.10),
+            ("0.05 €", 0.05),
+            ("0.02 €", 0.02),
+            ("0.01 €", 0.01),
         ]
+
+        # ── HEADER ──
+        header = tk.Frame(popup, bg="#313244", pady=12)
+        header.pack(fill='x')
+
+        tk.Label(
+            header, text="💰 ESPÈCES",
+            bg="#313244", fg="#89b4fa",
+            font=('Segoe UI', 13, 'bold')
+        ).pack()
+
+        # ── TABLEAU COUPURES ──
+        frame_tree = tk.Frame(popup, bg="#1e1e2e")
+        frame_tree.pack(fill='both', expand=True, padx=15, pady=10)
+
+        frame_header = tk.Frame(frame_tree, bg="#313244")
+        frame_header.pack(fill='x', pady=(0, 5))
+
+        tk.Label(frame_header, text="Valeur", bg="#313244", fg="#cdd6f4",
+                 font=('Segoe UI', 9, 'bold'), width=20, anchor='w', padx=5).pack(side='left')
+        tk.Label(frame_header, text="Quantité", bg="#313244", fg="#cdd6f4",
+                 font=('Segoe UI', 9, 'bold'), width=15, anchor='center').pack(side='left')
+        tk.Label(frame_header, text="Montant", bg="#313244", fg="#cdd6f4",
+                 font=('Segoe UI', 9, 'bold'), width=15, anchor='center').pack(side='left')
+
+        canvas = tk.Canvas(frame_tree, bg="#1e1e2e", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(frame_tree, orient='vertical', command=canvas.yview)
+        scrollable = tk.Frame(canvas, bg="#1e1e2e")
+
+        scrollable.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
         quantites = {}
+        montants = {}
 
-        for i, (valeur_str, valeur_num) in enumerate(coupures):
-            row = i // 3
-            col = i % 3
+        for idx, (valeur_str, valeur_num) in enumerate(coupures):
+            frame_row = tk.Frame(scrollable, bg="#1e1e2e" if idx % 2 == 0 else "#151520")
+            frame_row.pack(fill='x', pady=2)
 
-            frame = tk.Frame(frame_coupures, bg="#1e1e2e")
-            frame.grid(row=row, column=col, padx=8, pady=6, sticky="ew")
+            tk.Label(frame_row, text=valeur_str, bg=frame_row['bg'], fg="#89b4fa",
+                     font=('Segoe UI', 10), width=20, anchor='w', padx=5).pack(side='left')
 
-            tk.Label(
-                frame, text=valeur_str,
-                bg="#1e1e2e", fg="#cdd6f4",
-                font=("Segoe UI", 9)
-            ).pack(side="left", padx=5)
+            qty_var = tk.StringVar(value="0")
+            quantites[valeur_num] = qty_var
 
-            var = tk.IntVar(value=0)
-            quantites[valeur_num] = var
+            entry_qty = tk.Entry(frame_row, textvariable=qty_var, width=12,
+                                 font=('Segoe UI', 11), bg="#313244", fg="#cdd6f4",
+                                 insertbackground="white", justify='center')
+            entry_qty.pack(side='left', padx=5)
 
-            tk.Spinbox(
-                frame, from_=0, to=999,
-                textvariable=var,
-                width=6, bg="#313244", fg="#cdd6f4",
-                font=("Segoe UI", 9)
-            ).pack(side="left")
+            lbl_montant = tk.Label(frame_row, text="= 0.00 €", bg=frame_row['bg'],
+                                   fg="#a6e3a1", font=('Segoe UI', 10), width=15, anchor='center')
+            lbl_montant.pack(side='left', padx=5)
+            montants[valeur_num] = lbl_montant
 
-        def recalculer_total():
-            total = 0.0
-            for valeur_num, var in quantites.items():
-                total += valeur_num * var.get()
-            lbl_total.config(text=f"Total : {total:.2f} €")
-            return total
+            def creer_callback(val_num):
+                def on_change(*args):
+                    try:
+                        qty = float(qty_var.get()) if qty_var.get() else 0
+                        montant = qty * val_num
+                        montants[val_num].config(text=f"= {montant:.2f} €")
+                        recalculer_total()
+                    except ValueError:
+                        pass
 
-        for var in quantites.values():
-            var.trace("w", lambda *_: recalculer_total())
+                return on_change
+
+            qty_var.trace('w', creer_callback(valeur_num))
+
+        canvas.pack(side='left', fill='both', expand=True)
+        scrollbar.pack(side='right', fill='y')
+
+        # ── TOTAUX ──
+        frame_totaux = tk.Frame(popup, bg="#181825", pady=12)
+        frame_totaux.pack(fill='x', padx=15, pady=10)
 
         lbl_total = tk.Label(
-            frame_coupures, text="Total : 0.00 €",
-            bg="#1e1e2e", fg="#a6e3a1",
-            font=("Segoe UI", 11, "bold")
+            frame_totaux, text="Total saisi: 0.00 €",
+            bg="#181825", fg="#a6e3a1",
+            font=('Segoe UI', 12, 'bold')
         )
-        lbl_total.pack(pady=10)
+        lbl_total.pack()
 
-        # ===== NOTES =====
-        frame_notes = tk.LabelFrame(
-            popup, text="Notes",
-            bg="#1e1e2e", fg="#cdd6f4",
-            font=("Segoe UI", 10, "bold")
+        lbl_diff = tk.Label(
+            frame_totaux, text="Diff: +0.00 €",
+            bg="#181825", fg="#f9e2af",
+            font=('Segoe UI', 11)
         )
-        frame_notes.pack(fill="x", padx=20, pady=10)
+        lbl_diff.pack()
+
+        def recalculer_total() -> float:
+            """Recalcule le total et la différence."""
+            total = 0.0
+            for valeur_num in quantites.keys():
+                try:
+                    qty = float(quantites[valeur_num].get()) if quantites[valeur_num].get() else 0
+                    total += qty * valeur_num
+                except ValueError:
+                    pass
+
+            lbl_total.config(text=f"Total saisi: {total:.2f} €")
+            lbl_diff.config(text=f"Diff: +{total:.2f} €")
+            return total
+
+        # ── NOTES ──
+        frame_notes = tk.Frame(popup, bg="#1e1e2e")
+        frame_notes.pack(fill='x', padx=15, pady=5)
+
+        tk.Label(frame_notes, text="Notes:", bg="#1e1e2e", fg="#cdd6f4",
+                 font=('Segoe UI', 10, 'bold')).pack(anchor='w')
 
         notes_var = tk.StringVar()
-        tk.Entry(
-            frame_notes, textvariable=notes_var,
-            font=("Segoe UI", 10),
-            bg="#313244", fg="#cdd6f4", insertbackground="white"
-        ).pack(fill="x", pady=5)
+        tk.Entry(frame_notes, textvariable=notes_var, font=('Segoe UI', 10),
+                 bg="#313244", fg="#cdd6f4", insertbackground="white").pack(fill='x', pady=5)
 
-        # ===== BOUTONS =====
+        # ── BOUTONS ──
         frame_btn = tk.Frame(popup, bg="#1e1e2e")
-        frame_btn.pack(fill="x", padx=20, pady=15)
+        frame_btn.pack(fill='x', padx=15, pady=15)
 
-        def valider():
+        def valider() -> None:
+            """Valide et sauvegarde."""
             total = recalculer_total()
 
             if total == 0:
-                messagebox.showwarning(
-                    "⚠️ Montant requis",
-                    "Entrez au moins une coupure",
-                    parent=popup
-                )
+                messagebox.showwarning("⚠️ Montant requis",
+                                       "Entrez au moins une coupure", parent=popup)
                 return
 
+            detail_parts = []
             detail_especes = {}
-            for valeur_str, valeur_num in coupures:
-                qty = quantites[valeur_num].get()
-                if qty > 0:
-                    detail_especes[valeur_str] = qty
 
-            entry = {
-                "date": date_str,
-                "type": "kiosque_photo",
-                "montant": round(total, 2),
-                "detail": detail_especes,
-                "notes": notes_var.get(),
-                "timestamp": datetime.now().isoformat()
+            for valeur_str, valeur_num in coupures:
+                try:
+                    qty = float(quantites[valeur_num].get()) if quantites[valeur_num].get() else 0
+                    if qty > 0:
+                        detail_parts.append(f"{int(qty)}x{valeur_str}")
+                        detail_especes[str(valeur_num)] = {
+                            "quantite": int(qty),
+                            "montant": qty * valeur_num
+                        }
+                except ValueError:
+                    pass
+
+            detail = " + ".join(detail_parts)
+            notes = notes_var.get().strip()
+            date_str = self.date_var.get()
+
+            kiosque_entry = {
+                'montant': total,
+                'detail': detail,
+                'notes': notes,
+                'heure': datetime.now().strftime('%H:%M:%S'),
+                'date': date_str
             }
 
-            json_dir = Path("data/kiosque")
-            json_dir.mkdir(parents=True, exist_ok=True)
-
-            date_fmt = date_str.replace('/', '-')
-            json_file = json_dir / f"kiosque_{date_fmt}.json"
-
-            data = []
-            if json_file.exists():
-                try:
-                    with open(json_file, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
-                except Exception:
-                    data = []
-
-            data.append(entry)
-
-            with open(json_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-
-            logger.info(f"Kiosque sauvegardé: {json_file}")
+            self._sauvegarder_kiosque(date_str, kiosque_entry)
 
             try:
-                alimenter_depuis_caisse(
-                    "KIOSQUE",
+                # ✅ CORRIGÉ
+                stock.alimenter_depuis_caisse(
+                    'kiosque',
                     date_str,
                     {
-                        "especes_bande": total,
-                        "pieces_bande": 0,
-                        "tous_modes": {"especes_bande": total}
+                        'detail_especes': detail_especes,
+                        'detail_cheques_vac_coupures': {},
+                        'detail_cheques': [],
+                        'ancv_connect': 0.0
                     }
                 )
-                logger.info("✅ Stock alimenté depuis kiosque photo")
-            except Exception as e:
-                logger.error(f"❌ Erreur alimentation stock kiosque: {e}")
+                _log.info(f"[MODULE3][UI] Stock alimenté depuis kiosque")
+            except Exception as err:
+                _log.error(f"[MODULE3][UI] Erreur stock kiosque : {err}")
+                messagebox.showerror("❌ Erreur", f"Erreur stock: {err}", parent=popup)
+                return
 
-            messagebox.showinfo(
-                "✅ Succès",
-                f"Kiosque sauvegardé: {total:.2f} €",
-                parent=popup
-            )
             popup.destroy()
+            messagebox.showinfo(
+                "✅ Kiosque Photo",
+                f"Montant: {total:.2f}€\n✓ Stock alimenté",
+                parent=self
+            )
 
-        tk.Button(
-            frame_btn, text="✅ Valider",
-            bg="#a6e3a1", fg="#1e1e2e",
-            font=("Segoe UI", 10, "bold"),
-            relief="flat", padx=15, pady=6,
-            command=valider
-        ).pack(side="left", padx=5)
+        tk.Button(frame_btn, text="✅ Valider", command=valider,
+                  bg="#a6e3a1", fg="#1e1e2e", font=('Segoe UI', 11, 'bold'),
+                  relief='flat', padx=20, pady=8, width=20).pack(side='left', padx=5)
 
-        tk.Button(
-            frame_btn, text="❌ Annuler",
-            bg="#f38ba8", fg="#1e1e2e",
-            font=("Segoe UI", 10, "bold"),
-            relief="flat", padx=15, pady=6,
-            command=popup.destroy
-        ).pack(side="left", padx=5)
+        tk.Button(frame_btn, text="❌ Annuler", command=popup.destroy,
+                  bg="#f38ba8", fg="#1e1e2e", font=('Segoe UI', 11, 'bold'),
+                  relief='flat', padx=20, pady=8, width=20).pack(side='left', padx=5)
 
-    def _sauvegarder_verification(self):
-        """Sauvegarde TOUTES les caisses comme vérifiées"""
+    def _sauvegarder_kiosque(self, date_str: str, entry: dict) -> None:
+        """Sauvegarde l'entrée kiosque en JSON."""
+        json_dir = Path("data/kiosque")
+        json_dir.mkdir(parents=True, exist_ok=True)
+
+        date_fmt = date_str.replace('/', '-')
+        json_file = json_dir / f"kiosque_{date_fmt}.json"
+
+        data = []
+        if json_file.exists():
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            except Exception:
+                data = []
+
+        data.append(entry)
+
+        with open(json_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+        _log.info(f"[MODULE3][UI] Kiosque sauvegardé : {json_file}")
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # VERIFICATION ET EXPORT
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def _sauvegarder_verification(self) -> None:
+        """Sauvegarde toutes les caisses comme vérifiées."""
         date_str = self.date_var.get().strip()
 
         if not self.caisses_data:
-            messagebox.showwarning(
-                "⚠️ Aucune caisse",
-                "Charger les caisses d'abord",
-                parent=self
-            )
+            messagebox.showwarning("⚠️ Aucune caisse", "Charger les caisses d'abord", parent=self)
             return
 
         try:
@@ -580,31 +635,31 @@ class AppCaisses(tk.Frame):
                     'tous_modes': caisse_data
                 }
 
-            verif_data = {'caisses_verif': caisses_verif}
-            sauvegarder_verification(date_str, verif_data)
+            # ✅ CORRIGÉ
+            verification.sauvegarder_verification(date_str, {'caisses_verif': caisses_verif})
 
-            logger.info(f"✅ Vérifications sauvegardées : {caisses_verif}")
+            _log.info(f"[MODULE3][UI] Vérifications sauvegardées")
             messagebox.showinfo(
                 "✅ Succès",
                 f"{len(caisses_verif)} caisse(s) sauvegardée(s)",
                 parent=self
             )
 
-        except Exception as e:
-            logger.error(f"Erreur sauvegarde : {e}")
-            messagebox.showerror("❌ Erreur", f"Erreur : {e}", parent=self)
+        except Exception as err:
+            _log.error(f"[MODULE3][UI] Erreur sauvegarde : {err}")
+            messagebox.showerror("❌ Erreur", f"Erreur : {err}", parent=self)
 
-    def _exporter_csv_remise(self):
-        """Exporte les caisses vérifiées en CSV pour la remise banque"""
+    def _exporter_csv_remise(self) -> None:
+        """Exporte les caisses en CSV pour la remise banque."""
         date_str = self.date_var.get().strip()
 
-        recalculer_totaux_verification(date_str)
-        verif_data = charger_verification(date_str)
+        # ✅ CORRIGÉ
+        verif_data = verification.charger_verification(date_str)
 
         if not verif_data or not verif_data.get('caisses_verif'):
             messagebox.showwarning(
-                "⚠️ Aucune verification",
-                "Aucune verification trouvee pour cette date",
+                "⚠️ Aucune vérification",
+                "Aucune vérification trouvée pour cette date",
                 parent=self
             )
             return
@@ -618,13 +673,7 @@ class AppCaisses(tk.Frame):
             with open(csv_file, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f, delimiter=';', lineterminator='\n')
 
-                writer.writerow([
-                    'Date',
-                    'Numero piece',
-                    'Designation',
-                    'Debit',
-                    'Credit'
-                ])
+                writer.writerow(['Date', 'Numero piece', 'Designation', 'Debit', 'Credit'])
 
                 caisses_verif = verif_data.get('caisses_verif', {})
                 compteur_piece = 1
@@ -636,49 +685,22 @@ class AppCaisses(tk.Frame):
                     total_pieces = str(caisse_data.get('total_pieces', 0)).replace('.', ',')
                     total_especes = str(caisse_data.get('total_especes', 0)).replace('.', ',')
 
-                    writer.writerow([
-                        date_str,
-                        num_piece,
-                        f"Caisse {num_caisse} - BILLETS",
-                        total_billets,
-                        ''
-                    ])
-
-                    writer.writerow([
-                        date_str,
-                        num_piece,
-                        f"Caisse {num_caisse} - PIECES",
-                        total_pieces,
-                        ''
-                    ])
-
-                    writer.writerow([
-                        date_str,
-                        num_piece,
-                        f"Caisse {num_caisse} - TOTAL",
-                        '',
-                        total_especes
-                    ])
+                    writer.writerow([date_str, num_piece, f"Caisse {num_caisse} - BILLETS", total_billets, ''])
+                    writer.writerow([date_str, num_piece, f"Caisse {num_caisse} - PIECES", total_pieces, ''])
+                    writer.writerow([date_str, num_piece, f"Caisse {num_caisse} - TOTAL", '', total_especes])
 
                     compteur_piece += 1
 
             messagebox.showinfo(
-                "✅ Export reussi",
-                f"CSV sauvegarde: {csv_file}",
+                "✅ Export réussi",
+                f"CSV sauvegardé: {csv_file}",
                 parent=self
             )
-            logger.info(f"CSV exporté: {csv_file}")
+            _log.info(f"[MODULE3][UI] CSV exporté : {csv_file}")
 
-        except Exception as e:
-            messagebox.showerror(
-                "❌ Erreur export",
-                f"Erreur: {str(e)}",
-                parent=self
-            )
-            logger.error(f"Erreur export CSV : {e}")
+        except Exception as err:
+            messagebox.showerror("❌ Erreur export", f"Erreur: {str(err)}", parent=self)
+            _log.error(f"[MODULE3][UI] Erreur export CSV : {err}")
 
-    def _retour(self):
-        """Retourner à l'écran précédent"""
-        self.destroy()
-        if self.retour:
-            self.retour()
+
+__all__ = ["AppCaisses"]

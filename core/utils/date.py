@@ -1,10 +1,10 @@
-# core/utils/date.py
 """
 Utilitaires pour les dates.
 """
 
 from datetime import datetime, timedelta
 from typing import Optional, Union
+import pandas as pd
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # FORMATS DE DATE
@@ -14,7 +14,6 @@ FORMAT_DATE_FR = "%d/%m/%Y"  # 15/12/2023
 FORMAT_DATE_ISO = "%Y-%m-%d"  # 2023-12-15
 FORMAT_DATE_COMPTA = "%d/%m/%Y"  # Format comptable français
 FORMAT_DATETIME_ISO = "%Y-%m-%d %H:%M:%S"
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONVERSION DE DATES
@@ -52,7 +51,8 @@ def formater_date(date_str: Union[str, datetime], format_sortie: str = FORMAT_DA
         "%d/%m/%Y",  # Français
         "%d-%m-%Y",  # Tirets
         "%Y/%m/%d",  # Inverse
-        "%d%m%Y",  # Sans séparateur
+        "%d%m%Y",  # Sans séparateur JJMMAAAA
+        "%Y%m%d",  # ✅ Sans séparateur AAAAMMJJ — fichiers BANQUE
     ]
 
     for fmt in formats_entree:
@@ -63,6 +63,24 @@ def formater_date(date_str: Union[str, datetime], format_sortie: str = FORMAT_DA
             continue
 
     return None
+
+
+def formater_date_fr(val: Union[str, datetime]) -> Optional[str]:
+    """
+    Alias pour formater_date() — retourne JJ/MM/AAAA.
+    Gère aussi les NaN pandas.
+
+    Args:
+        val: String, datetime, ou NaN pandas
+
+    Returns:
+        String JJ/MM/AAAA ou None si invalide
+    """
+    # ✅ Gère NaN pandas
+    if pd.isna(val):
+        return None
+
+    return formater_date(val, FORMAT_DATE_FR)
 
 
 def formater_date_ecriture(
@@ -135,11 +153,11 @@ def ajouter_jours(date_str: Union[str, datetime], jours: int) -> Optional[dateti
     """
 
     if isinstance(date_str, str):
-        dt = formater_date(date_str)
-        if not dt:
+        dt_str = formater_date(date_str, FORMAT_DATE_ISO)
+        if not dt_str:
             return None
         # Reconvertir en datetime
-        dt = datetime.strptime(dt, FORMAT_DATE_FR)
+        dt = datetime.strptime(dt_str, FORMAT_DATE_ISO)
     else:
         dt = date_str
 
@@ -155,22 +173,14 @@ def extraire_mois_annee(date_str: Union[str, datetime]) -> tuple:
     """
 
     if isinstance(date_str, str):
-        date_obj = datetime.strptime(formater_date(date_str, FORMAT_DATE_ISO), FORMAT_DATE_ISO)
+        date_fmt = formater_date(date_str, FORMAT_DATE_ISO)
+        if not date_fmt:
+            return None, None
+        date_obj = datetime.strptime(date_fmt, FORMAT_DATE_ISO)
     else:
         date_obj = date_str
 
-    return (date_obj.month, date_obj.year)
-
-
-__all__ = [
-    "FORMAT_DATE_FR",
-    "FORMAT_DATE_ISO",
-    "FORMAT_DATE_COMPTA",
-    "formater_date",
-    "formater_date_ecriture",
-    "ajouter_jours",
-    "extraire_mois_annee",
-]
+    return date_obj.month, date_obj.year
 
 
 def date_en_cle(date_str: Union[str, datetime]) -> str:
@@ -208,8 +218,9 @@ __all__ = [
     "FORMAT_DATE_ISO",
     "FORMAT_DATE_COMPTA",
     "formater_date",
+    "formater_date_fr",  # ✅ NOUVEAU
     "formater_date_ecriture",
     "ajouter_jours",
     "extraire_mois_annee",
-    "date_en_cle",  # ✅ AJOUT
+    "date_en_cle",
 ]

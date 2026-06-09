@@ -1,0 +1,28 @@
+Rapport des constantes partagées entre handlers (version améliorée)
+============================================================
+ANALYTIQUE_VIDE → traiter_alma.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py
+AUXILIAIRE_VIDE → traiter_alma.py, traiter_amex_caisse.py, traiter_amex_internet.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py
+COL_ANALYTIQUE → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_AUX → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_COMPTE → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_CREDIT → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_D → traiter_amex_caisse.py, traiter_amex_internet.py
+COL_DATE → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_DEBIT → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_E → traiter_amex_caisse.py, traiter_amex_internet.py
+COL_G → traiter_amex_caisse.py, traiter_amex_internet.py
+COL_I → traiter_amex_caisse.py, traiter_amex_internet.py
+COL_JOURNAL → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_MONTANT → traiter_alma.py, traiter_kiosk_photo.py
+COL_OBJET → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_PIECE → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COL_STE → traiter_alma.py, traiter_amex_caisse.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+COMPTE_AVOIR → traiter_ancv.py, traiter_avoirs.py
+COMPTE_BANQUE → traiter_alma.py, traiter_amex_caisse.py, traiter_amex_internet.py, traiter_banque.py
+COMPTE_TRANSIT → traiter_alma.py, traiter_amex_caisse.py, traiter_amex_internet.py
+COMPTE_VENTE → traiter_planet.py, traiter_ta.py
+DOSSIER_SORTIE → traiter_alma.py, traiter_amex_caisse.py, traiter_amex_internet.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py
+JOURNAL_CEBOOBA → traiter_amex_caisse.py, traiter_amex_internet.py, traiter_banque.py
+JOURNAL_OD → traiter_ancv.py, traiter_avoirs.py
+JOURNAL_VE → traiter_kiosk_photo.py, traiter_ta.py
+STE_DLM → traiter_alma.py, traiter_amex_caisse.py, traiter_amex_internet.py, traiter_ancv.py, traiter_avoirs.py, traiter_banque.py, traiter_kiosk_photo.py, traiter_planet.py, traiter_ta.py

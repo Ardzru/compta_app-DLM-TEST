@@ -40,12 +40,27 @@ class ResultatHandler:
     fichier_sortie: Optional[Path] = None
     erreur: Optional[str] = None
     donnees: Dict[str, Any] = field(default_factory=dict)
+    logs: list[str] = field(default_factory=list)
     temps_execution: float = 0.0
 
     def __post_init__(self):
         """Valide le résultat."""
         if self.status == StatusResultat.ERREUR and not self.erreur:
             self.erreur = self.message
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convertit le résultat en dictionnaire."""
+        return {
+            "fichier": str(self.fichier),
+            "status": self.status.value,
+            "message": self.message,
+            "nb_lignes_traitees": self.nb_lignes_traitees,
+            "fichier_sortie": str(self.fichier_sortie) if self.fichier_sortie else None,
+            "erreur": self.erreur,
+            "donnees": self.donnees,
+            "logs": self.logs,
+            "temps_execution": self.temps_execution,
+        }
 
 # ==========================================================
 # BASE HANDLER
@@ -96,3 +111,20 @@ class FileHandlerBase:
     def log_error(self, msg: str) -> None:
         """Log error."""
         logger.error(f"[{self.nom}] {msg}")
+
+
+
+BaseHandler = FileHandlerBase
+ContexteHandler = Dict[str, Any]
+StatusHandler = StatusResultat
+
+
+__all__ = [
+    "TypeModele",
+    "StatusResultat",
+    "StatusHandler",
+    "ResultatHandler",
+    "FileHandlerBase",
+    "BaseHandler",
+    "ContexteHandler",
+]

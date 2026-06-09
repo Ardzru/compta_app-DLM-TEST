@@ -1,17 +1,23 @@
 """
 Utilitaires pour les calculs monétaires.
+Centralise les fonctions de conversion et formatage des montants.
 """
 
 import re
 from typing import Optional, Union
 
+from config import logger
+
+# ============================================================================
+# FONCTIONS DE CONVERSION
+# ============================================================================
 
 def to_float(val) -> Optional[float]:
     """
     Convertit une valeur en float de manière robuste.
 
     Args:
-        val: Valeur à convertir (str, int, float, etc.)
+        val: Valeur à convertir (str, int, float, None, etc.)
 
     Returns:
         float ou None si conversion impossible
@@ -23,6 +29,8 @@ def to_float(val) -> Optional[float]:
         123.45
         >>> to_float(None)
         None
+        >>> to_float("1 000,50")
+        1000.5
     """
     if val is None or val == "":
         return None
@@ -37,7 +45,7 @@ def to_float(val) -> Optional[float]:
         if not val_str:
             return None
 
-        # Remplacer virgule par point
+        # Remplacer virgule par point (format français)
         val_str = val_str.replace(",", ".")
 
         # Supprimer les espaces
@@ -45,14 +53,13 @@ def to_float(val) -> Optional[float]:
 
         return float(val_str)
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as e:
+        logger.debug(f"Conversion to_float échouée pour '{val}': {e}")
         return None
-
 
 def nettoyer_montant(montant: Union[str, float, int, None]) -> str:
     """
     Nettoie un montant brut : enlève €, espaces, symboles, etc.
-
     Convertit aussi les virgules en points pour faciliter les calculs.
 
     Args:
@@ -97,9 +104,42 @@ def nettoyer_montant(montant: Union[str, float, int, None]) -> str:
         else:
             return "0"
 
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError) as e:
+        logger.debug(f"Nettoyage montant échoué pour '{montant}': {e}")
         return "0"
 
+def arrondir_montant(montant: Union[float, int, str, None], decimales: int = 2) -> float:
+    """
+    Arrondit un montant à N décimales.
+
+    Args:
+        montant: Montant à arrondir
+        decimales: Nombre de décimales (défaut: 2)
+
+    Returns:
+        Montant arrondi
+
+    Exemples:
+        >>> arrondir_montant(123.456)
+        123.46
+        >>> arrondir_montant("123,456")
+        123.46
+    """
+    if montant is None or montant == "":
+        return 0.0
+
+    try:
+        montant = to_float(montant)
+        if montant is None:
+            return 0.0
+        return round(float(montant), decimales)
+    except (ValueError, TypeError) as e:
+        logger.debug(f"Arrondi montant échoué pour '{montant}': {e}")
+        return 0.0
+
+# ============================================================================
+# FONCTIONS DE FORMATAGE
+# ============================================================================
 
 def format_montant(montant: Union[float, int, str, None], devises: str = "€") -> str:
     """
@@ -130,7 +170,8 @@ def format_montant(montant: Union[float, int, str, None], devises: str = "€") 
             return "0,00 €"
 
         montant = float(montant)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as e:
+        logger.debug(f"Formatage montant échoué pour '{montant}': {e}")
         return "0,00 €"
 
     # Formater avec 2 décimales
@@ -151,34 +192,35 @@ def format_montant(montant: Union[float, int, str, None], devises: str = "€") 
 
     return f"{partie_entiere},{partie_decimale} {devises}"
 
-
-def arrondir_montant(montant: Union[float, int, str, None], decimales: int = 2) -> float:
+def format_montant_compta(montant: Union[float, int, str, None]) -> str:
     """
-    Arrondit un montant à N décimales.
+    Formate un montant pour export comptable CSV.
 
-    Args:
-        montant: Montant à arrondir
-        decimales: Nombre de décimales (défaut: 2)
+    Retourne :
+    - valeur absolue
+    - 2 décimales
+    - virgule décimale
+    - sans symbole devise
 
-    Returns:
-        Montant arrondi
-
-    Exemples:
-        >>> arrondir_montant(123.456)
-        123.46
-        >>> arrondir_montant("123,456")
-        123.46
+    Exemple :
+        1234.5 -> "1234,50"
     """
     if montant is None or montant == "":
-        return 0.0
+        return "0,00"
 
     try:
-        montant = to_float(montant)
-        if montant is None:
-            return 0.0
-        return round(float(montant), decimales)
-    except (ValueError, TypeError):
-        return 0.0
+        montant_float = to_float(montant)
+        if montant_float is None:
+            return "0,00"
+        return f"{abs(float(montant_float)):.2f}".replace(".", ",")
+    except (ValueError, TypeError) as e:
+        logger.debug(f"Formatage montant compta échoué pour '{montant}': {e}")
+        return "0,00"
 
-
-__all__ = ["to_float", "format_montant", "arrondir_montant", "nettoyer_montant"]
+__all__ = [
+    "to_float",
+    "nettoyer_montant",
+    "arrondir_montant",
+    "format_montant",
+    "format_montant_compta",
+]

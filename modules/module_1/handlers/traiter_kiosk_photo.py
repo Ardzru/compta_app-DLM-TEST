@@ -1,22 +1,28 @@
-# handlers/module_1/traiter_kiosk_photo.py
 """
-Module 1 : Traitement KIOSK PHOTO
+Module 1 - Handler KIOSK_PHOTO
+Traite les fichiers de ventes du kiosque photo et génère les écritures comptables
 """
 
-import pandas as pd
 from pathlib import Path
 from typing import Optional
+import pandas as pd
 
-from config import DOSSIER_SORTIE, logger
-
-from core.utils.montant import to_float, format_montant
-from core.utils.date import formater_date
-from core.utils.colonnes import STE_DEFAUT, COLONNES_SORTIE
+from config import DOSSIER_SORTIE
+from config import logger
+from core.moniteur_schema import comparer_schema
+from core.utils.montant import format_montant_compta
 from core.utils.constantes import (
-    COMPTE_BANQUE,
-    COMPTE_TVA,
-    COMPTE_PRODUITS,
-    JOURNAUX,
+    STE_DLM,
+    COMPTE_VENTES,
+    COMPTE_TVA_COLLECTEE,
+    COMPTE_MONNAYEUR,
+    COMPTE_TPE,
+    JOURNAL_VE,
+    ANALYTIQUE_VIDE,
+    COL_STE, COL_DATE, COL_COMPTE, COL_AUX,
+    COL_PIECE, COL_OBJET, COL_DEBIT, COL_CREDIT,
+    COL_JOURNAL, COL_ANALYTIQUE,
+    COLONNES_SORTIE,
 )
 
 # ==========================================================
@@ -24,193 +30,271 @@ from core.utils.constantes import (
 # ==========================================================
 
 class NotKioskPhotoFileError(Exception):
-    """Levée si aucun kiosk photo exploitable n'est trouvé."""
+    """Levée si aucune vente kiosque photo exploitable n'est trouvée."""
     pass
 
 # ==========================================================
-# CONSTANTES COLONNES KIOSK PHOTO (SPÉCIFIQUES AU MODULE)
+# COLONNES ATTENDUES
+# ==========================================================
+_COL_DATE    = "dateheure"
+_COL_MONTANT = "montant"
+_COL_VENDEUR = "vendeur"
+
+_COLONNES_REQUISES = [_COL_DATE, _COL_MONTANT, _COL_VENDEUR]
+
+# ==========================================================
+# CONSTANTES MÉTIER
+# ==========================================================
+_TAUX_TVA = 1.20
+
+_ANALYTIQUE_CA  = "AD-CO14-XX"
+_ANALYTIQUE_ENC = ""
+
+# ==========================================================
+# UTILITAIRES INTERNES
 # ==========================================================
 
-KIOSK_PHOTO_COL = {
-    "date": "Date",
-    "num_txn": "Transaction",
-    "montant_brut": "Montant Brut",
-    "tva": "TVA",
-    "montant_net": "Montant Net",
-    "libelle": "Libellé",
-    "type_monnayeur": "Type",
-}
+def _formater_date(val) -> Optional[str]:
+    """
+    Formate une date au format JJ/MM/AAAA.
+
+    Retourne None si la date est invalide.
+    """
+    d = pd.to_datetime(val, dayfirst=True, errors="coerce")
+    if pd.isna(d):
+        logger.warning(f"[KIOSK] Date invalide ignorée : {val!r}")
+        return None
+    return d.strftime("%d/%m/%Y")
+
+
+def _lire_fichier(fichier: Path) -> pd.DataFrame:
+    """
+    Lit le fichier source selon son extension.
+
+    - .csv → pd.read_csv avec séparateur ";"
+    - autres → pd.read_excel
+    """
+    ext = fichier.suffix.lower()
+    if ext == ".csv":
+        return pd.read_csv(fichier, sep=";", encoding="utf-8")
+    return pd.read_excel(fichier, engine="openpyxl")
+
+
+def _verifier_colonnes(df: pd.DataFrame, fichier: Path) -> None:
+    """
+    Vérifie que les colonnes attendues sont présentes.
+
+    Lève ValueError si colonnes manquantes.
+    """
+    manquantes = [c for c in _COLONNES_REQUISES if c not in df.columns]
+    if manquantes:
+        msg = (
+            f"Colonnes manquantes dans {fichier.name} : {manquantes}\n"
+            f"Colonnes trouvées : {list(df.columns)}"
+        )
+        raise ValueError(msg)
 
 # ==========================================================
 # HANDLER PRINCIPAL
 # ==========================================================
 
-def traiter_kiosk_photo(fichier: Path) -> Optional[Path]:
+def traiter_kiosk_photo(fichier: Path) -> tuple[str, str]:
     """
-    Traite un fichier KIOSK PHOTO et génère les écritures comptables.
+    Traite un fichier de ventes du kiosque photo (luge)
+    et génère les écritures comptables correspondantes.
 
-    Règles métier :
-    - Débit monnayeur/TPE
-    - Crédit TVA collectée (44571)
-    - Crédit Produits ventes (706)
+    Logique métier :
+    - Les ventes JETON sont exclues
+    - TVA à 20 % calculée sur le TTC
+    - Encaissements ventilés : MONNAYEUR (580001) / TPE (580005)
 
-    Returns:
-        Path: Chemin du fichier généré
+    Retourne:
+        ("OK", chemin_fichier) | ("ERREUR", message)
     """
 
     fichier = Path(fichier)
     if not fichier.exists():
-        raise FileNotFoundError(f"Fichier KIOSK PHOTO introuvable : {fichier}")
+        msg = f"Fichier kiosque photo introuvable : {fichier}"
+        logger.error(f"[KIOSK] {msg}")
+        return "ERREUR", msg
 
-    logger.info(f"Traitement KIOSK PHOTO : {fichier.name}")
+    logger.info(f"[MODULE1][KIOSK] Début traitement : {fichier.name}")
 
-    # ----------------------------------------------------------
-    # 1. Lecture + validation
-    # ----------------------------------------------------------
-    df = pd.read_excel(fichier)
+    try:
+        # ----------------------------------------------------------
+        # 1. Lecture + validation schéma
+        # ----------------------------------------------------------
+        df = _lire_fichier(fichier)
 
-    if df.empty:
-        logger.error(f"Fichier vide : {fichier.name}")
-        return None
+        if df.empty:
+            msg = f"Fichier vide : {fichier.name}"
+            logger.warning(f"[KIOSK] {msg}")
+            return "ERREUR", msg
 
-    logger.info(f"Lignes lues : {len(df)}")
+        comparer_schema(df, "kiosk_photo")
+        _verifier_colonnes(df, fichier)
 
-    # ----------------------------------------------------------
-    # 2. Parcours des lignes
-    # ----------------------------------------------------------
-    transactions: dict = {}
-    nb_ignores = 0
+        # ----------------------------------------------------------
+        # 2. Parcours des ventes
+        # ----------------------------------------------------------
+        total_ttc       = 0.0
+        total_monnayeur = 0.0
+        total_tpe       = 0.0
+        date_journee    = None
+        nb_ignores      = 0
 
-    for idx, row in df.iterrows():
-        try:
-            date_str = str(row[KIOSK_PHOTO_COL["date"]]).strip()
-            date_compta = formater_date(date_str)
-            num_txn = str(row[KIOSK_PHOTO_COL["num_txn"]]).strip()
-            montant_brut = to_float(row[KIOSK_PHOTO_COL["montant_brut"]])
-            tva = to_float(row[KIOSK_PHOTO_COL["tva"]])
-            montant_net = to_float(row[KIOSK_PHOTO_COL["montant_net"]])
-            libelle = str(row[KIOSK_PHOTO_COL["libelle"]]).strip()
-            type_monnayeur = str(row[KIOSK_PHOTO_COL["type_monnayeur"]]).strip()
+        for idx, row in df.iterrows():
 
-            if not date_compta or montant_brut == 0:
+            # Date de journée = première ligne valide
+            if date_journee is None:
+                date_journee = _formater_date(row[_COL_DATE])
+
+            montant_raw = row[_COL_MONTANT]
+
+            if pd.isna(montant_raw):
                 nb_ignores += 1
                 continue
 
-            # Déterminer le compte de débit selon le type
-            if "TPE" in type_monnayeur.upper():
-                compte_debit = "5121"  # TPE Carte
+            montant = float(montant_raw)
+
+            if montant == 0:
+                nb_ignores += 1
+                continue
+
+            vendeur = str(row[_COL_VENDEUR]).strip().upper()
+
+            # Ventes jetons exclues
+            if "JETON" in vendeur:
+                logger.debug(f"[KIOSK] Ligne {idx} ignorée : vente JETON")
+                nb_ignores += 1
+                continue
+
+            total_ttc += montant
+
+            if "MONNAYEUR" in vendeur:
+                total_monnayeur += montant
+            elif "TPE" in vendeur:
+                total_tpe += montant
             else:
-                compte_debit = "5301"  # Caisses
+                logger.warning(
+                    f"[KIOSK] Ligne {idx} : vendeur non catégorisé {vendeur!r}, "
+                    f"comptabilisé en TTC uniquement"
+                )
 
-            transactions[num_txn] = {
-                "date": date_compta,
-                "montant_brut": round(montant_brut, 2),
-                "tva": round(tva, 2),
-                "montant_net": round(montant_net, 2),
-                "libelle": libelle,
-                "compte_debit": compte_debit,
-            }
+        # ----------------------------------------------------------
+        # 3. Vérification
+        # ----------------------------------------------------------
+        if total_ttc == 0:
+            msg = f"Aucune vente kiosque photo exploitable dans {fichier.name}"
+            logger.warning(f"[KIOSK] {msg}")
+            return "ERREUR", msg
 
-        except Exception as e:
-            logger.warning(f"Ligne {idx} ignorée : {str(e)}")
-            nb_ignores += 1
-            continue
+        if not date_journee:
+            msg = f"Impossible de déterminer la date de journée dans {fichier.name}"
+            logger.warning(f"[KIOSK] {msg}")
+            return "ERREUR", msg
 
-    logger.info(f"Transactions trouvées : {len(transactions)} | Ignorés : {nb_ignores}")
+        logger.info(
+            f"[KIOSK] TTC={total_ttc:.2f}€ "
+            f"Monnayeur={total_monnayeur:.2f}€ "
+            f"TPE={total_tpe:.2f}€ "
+            f"({nb_ignores} lignes ignorées)"
+        )
 
-    if not transactions:
-        logger.warning(f"Aucune transaction KIOSK PHOTO à traiter dans {fichier.name}")
-        return None
+        # ----------------------------------------------------------
+        # 4. Calculs comptables
+        # ----------------------------------------------------------
+        ht  = round(total_ttc / _TAUX_TVA, 2)
+        tva = round(total_ttc - ht, 2)
 
-    # ----------------------------------------------------------
-    # 3. Construction des écritures
-    # ----------------------------------------------------------
-    lignes_finales = []
+        piece = f"JOURNEE DU {date_journee}"
 
-    for num_txn, data in sorted(transactions.items()):
-        date_compta = data["date"]
-        montant_brut = data["montant_brut"]
-        tva = data["tva"]
-        montant_net = data["montant_net"]
-        libelle = data["libelle"]
-        compte_debit = data["compte_debit"]
+        # ----------------------------------------------------------
+        # 5. Construction des écritures
+        # ----------------------------------------------------------
+        lignes_finales = [
+            # Produit CA HT
+            {
+                COL_STE:        STE_DLM,
+                COL_DATE:       date_journee,
+                COL_COMPTE:     COMPTE_VENTES,
+                COL_AUX:        ANALYTIQUE_VIDE,
+                COL_PIECE:      piece,
+                COL_OBJET:      f"{piece} LUGE",
+                COL_DEBIT:      "",
+                COL_CREDIT:     format_montant_compta(ht),
+                COL_JOURNAL:    JOURNAL_VE,
+                COL_ANALYTIQUE: _ANALYTIQUE_CA,
+            },
+            # TVA collectée
+            {
+                COL_STE:        STE_DLM,
+                COL_DATE:       date_journee,
+                COL_COMPTE:     COMPTE_TVA_COLLECTEE,
+                COL_AUX:        ANALYTIQUE_VIDE,
+                COL_PIECE:      piece,
+                COL_OBJET:      f"TVA {piece} LUGE",
+                COL_DEBIT:      "",
+                COL_CREDIT:     format_montant_compta(tva),
+                COL_JOURNAL:    JOURNAL_VE,
+                COL_ANALYTIQUE: ANALYTIQUE_VIDE,
+            },
+        ]
 
-        # Ligne 1 : Débit compte monnayeur/TPE
-        lignes_finales.append({
-            "STE": STE_DEFAUT,
-            "DATE": date_compta,
-            "COMPTE": compte_debit,
-            "Auxiliaire": "",
-            "n°pièce": f"KIOSK-{num_txn}",
-            "OBJET": f"Vente photos {libelle}",
-            "D": format_montant(montant_net),
-            "C": "",
-            "Journal": JOURNAUX["kiosk_photo"],
-            "Analytique": "",
-        })
-
-        # Ligne 2 : Crédit TVA collectée
-        if tva > 0:
+        # Encaissement monnayeur
+        if total_monnayeur > 0:
             lignes_finales.append({
-                "STE": STE_DEFAUT,
-                "DATE": date_compta,
-                "COMPTE": COMPTE_TVA,
-                "Auxiliaire": "",
-                "n°pièce": f"KIOSK-{num_txn}",
-                "OBJET": f"TVA collectée - {libelle}",
-                "D": "",
-                "C": format_montant(tva),
-                "Journal": JOURNAUX["kiosk_photo"],
-                "Analytique": "",
+                COL_STE:        STE_DLM,
+                COL_DATE:       date_journee,
+                COL_COMPTE:     COMPTE_MONNAYEUR,
+                COL_AUX:        ANALYTIQUE_VIDE,
+                COL_PIECE:      piece,
+                COL_OBJET:      f"{piece} LUGE - MONNAYEUR",
+                COL_DEBIT:      format_montant_compta(total_monnayeur),
+                COL_CREDIT:     "",
+                COL_JOURNAL:    JOURNAL_VE,
+                COL_ANALYTIQUE: _ANALYTIQUE_ENC,
             })
 
-        # Ligne 3 : Crédit Produits ventes
-        montant_produit = round(montant_brut - tva, 2)
-        lignes_finales.append({
-            "STE": STE_DEFAUT,
-            "DATE": date_compta,
-            "COMPTE": COMPTE_PRODUITS,
-            "Auxiliaire": "",
-            "n°pièce": f"KIOSK-{num_txn}",
-            "OBJET": f"Produits ventes photos - {libelle}",
-            "D": "",
-            "C": format_montant(montant_produit),
-            "Journal": JOURNAUX["kiosk_photo"],
-            "Analytique": "ST-CT00-XX",
-        })
+        # Encaissement TPE
+        if total_tpe > 0:
+            lignes_finales.append({
+                COL_STE:        STE_DLM,
+                COL_DATE:       date_journee,
+                COL_COMPTE:     COMPTE_TPE,
+                COL_AUX:        ANALYTIQUE_VIDE,
+                COL_PIECE:      piece,
+                COL_OBJET:      f"{piece} LUGE - TPE",
+                COL_DEBIT:      format_montant_compta(total_tpe),
+                COL_CREDIT:     "",
+                COL_JOURNAL:    JOURNAL_VE,
+                COL_ANALYTIQUE: _ANALYTIQUE_ENC,
+            })
 
-    if not lignes_finales:
-        logger.warning(f"Aucune écriture générée pour {fichier.name}")
-        return None
+        # ----------------------------------------------------------
+        # 6. Export CSV
+        # ----------------------------------------------------------
+        DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
 
-    # ----------------------------------------------------------
-    # 4. Export CSV
-    # ----------------------------------------------------------
-    DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
+        df_final = pd.DataFrame(lignes_finales, columns=COLONNES_SORTIE)
+        sortie   = DOSSIER_SORTIE / f"{fichier.stem}_kiosk_photo.csv"
+        df_final.to_csv(sortie, sep=";", index=False, encoding="latin-1")
 
-    df_final = pd.DataFrame(lignes_finales)
-    sortie = DOSSIER_SORTIE / f"{fichier.stem}_kiosk_photo.csv"
-    df_final.to_csv(sortie, sep=";", index=False, encoding="latin1")
+        logger.info(
+            f"[MODULE1][KIOSK] Export réussi : {sortie.name} ({len(lignes_finales)} écritures)"
+        )
+        return "OK", str(sortie)
 
-    logger.info(f"Export KIOSK PHOTO : {sortie.name} ({len(lignes_finales)} écritures)")
+    except ValueError as e:
+        msg = f"Erreur validation : {e}"
+        logger.error(f"[KIOSK] {msg}")
+        return "ERREUR", msg
 
-    return sortie
+    except Exception as e:
+        msg = f"Erreur de traitement : {e}"
+        logger.error(f"[KIOSK] {msg}", exc_info=True)
+        return "ERREUR", msg
+
 
 # ==========================================================
-# CLASSE HANDLER
-# ==========================================================
-
-class TraiterKioskPhotoHandler:
-    """Handler pour traiter les fichiers KIOSK PHOTO."""
-
-    @staticmethod
-    def traiter(fichier: Path) -> None:
-        """Traite un fichier KIOSK PHOTO."""
-        traiter_kiosk_photo(fichier)
-
-    @staticmethod
-    def peut_traiter(detecteur_result: dict) -> bool:
-        """Vérifie si c'est un fichier KIOSK PHOTO."""
-        return detecteur_result.get("type") == "kiosk_photo"
-
-__all__ = ['TraiterKioskPhotoHandler', 'traiter_kiosk_photo']
+__all__ = ["traiter_kiosk_photo", "NotKioskPhotoFileError"]

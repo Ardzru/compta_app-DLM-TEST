@@ -24,12 +24,12 @@
           "montant": 0
         },
         "100": {
-          "quantite": 3,
-          "montant": 300
+          "quantite": 2,
+          "montant": 200
         },
         "50": {
-          "quantite": 1,
-          "montant": 50
+          "quantite": 3,
+          "montant": 150
         },
         "20": {
           "quantite": 1,
@@ -44,12 +44,12 @@
           "montant": 0
         },
         "2": {
-          "quantite": 1,
-          "montant": 2
-        },
-        "1": {
           "quantite": 0,
           "montant": 0
+        },
+        "1": {
+          "quantite": 2,
+          "montant": 2
         },
         "0.5": {
           "quantite": 0,
@@ -97,7 +97,7 @@
       "detail_ancv_connect": [],
       "detail_cheques": [],
       "validee": true,
-      "timestamp_validation": "2026-05-28T09:55:35.032432"
+      "timestamp_validation": "2026-05-28T09:13:38.033482"
     }
   }
 }

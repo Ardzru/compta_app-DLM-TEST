@@ -2,7 +2,7 @@
 ===============================================================================
 traiter_dossier.py
 ===============================================================================
-Point d'entrée principal : traitement batch de tous les fichiers bruts
+Point d'entree principal : traitement batch de tous les fichiers bruts
 Utilise utils_fichiers pour navigation et archivage
 ===============================================================================
 """
@@ -28,10 +28,9 @@ from config import logger
 # ============================================================================
 
 DOSSIER_FICHIERS = Path("fichiers_brut")
-ARCHIVE_BASE = Path("archive")
-LOCK_FILE = Path("traitement.lock")
-BACKUP_DIR = Path("backups")
-
+ARCHIVE_BASE     = Path("archive")
+LOCK_FILE        = Path("traitement.lock")
+BACKUP_DIR       = Path("backups")
 
 # ============================================================================
 # FONCTIONS UTILITAIRES
@@ -39,18 +38,18 @@ BACKUP_DIR = Path("backups")
 
 def verrouiller_traitement() -> bool:
     """
-    Créer un lock file pour éviter les traitements parallèles.
+    Creer un lock file pour eviter les traitements paralleles.
 
     Returns:
-        True si lock créé (traitement lancé)
-        False si lock existe déjà (traitement en cours)
+        True si lock cree (traitement lance)
+        False si lock existe deja (traitement en cours)
     """
     if LOCK_FILE.exists():
-        logger.warning("⚠️  Traitement déjà en cours — abandon")
+        logger.warning("Traitement deja en cours — abandon")
         return False
 
     LOCK_FILE.touch()
-    logger.debug(f"🔒 Lock file créé : {LOCK_FILE}")
+    logger.debug(f"Lock file cree : {LOCK_FILE}")
     return True
 
 
@@ -58,19 +57,19 @@ def deverrouiller_traitement():
     """Supprimer le lock file."""
     if LOCK_FILE.exists():
         LOCK_FILE.unlink()
-        logger.debug(f"🔓 Lock file supprimé")
+        logger.debug("Lock file supprime")
 
 
-def preparer_environnement():
-    """Créer les dossiers nécessaires."""
+def preparer_environnement() -> bool:
+    """Creer les dossiers necessaires."""
     try:
         creer_dossier(DOSSIER_FICHIERS)
         creer_dossier(ARCHIVE_BASE)
         creer_dossier(BACKUP_DIR)
-        logger.debug("✅ Environnement préparé")
+        logger.debug("Environnement prepare")
         return True
-    except Exception as e:
-        logger.error(f"❌ Erreur préparation environnement : {e}")
+    except Exception:
+        logger.exception("Erreur preparation environnement")
         return False
 
 
@@ -82,30 +81,28 @@ def traiter_fichier_xls(fichier: Path) -> bool:
         fichier: Chemin du fichier XLS
 
     Returns:
-        True si traitement réussi
+        True si traitement reussi
     """
     try:
-        logger.info(f"📄 Conversion XLS → XLSX : {fichier.name}")
+        logger.info(f"Conversion XLS -> XLSX : {fichier.name}")
 
-        # Conversion XLS → XLSX
-        fichier_xlsx = convertir_xls_en_xlsx(str(fichier))
+        fichier_xlsx = convertir_xls_en_xlsx(fichier)
 
         if fichier_xlsx is None:
-            logger.error(f"❌ Conversion échouée : {fichier.name}")
+            logger.error(f"Conversion echouee : {fichier.name}")
             return False
 
-        # Traiter le XLSX
-        succes = traiter_fichier(fichier_xlsx)
+        resultat = traiter_fichier(fichier_xlsx)
+        succes = resultat.get("statut") == "SUCCES"
 
         if succes:
-            # Supprimer le fichier XLSX converti (temporaire)
             supprimer_fichier(fichier_xlsx)
-            logger.info(f"🧹 Fichier temporaire supprimé : {Path(fichier_xlsx).name}")
+            logger.info(f"Fichier temporaire supprime : {Path(fichier_xlsx).name}")
 
         return succes
 
-    except Exception as e:
-        logger.error(f"❌ Erreur traitement XLS : {e}")
+    except Exception:
+        logger.exception(f"Erreur traitement XLS : {fichier.name}")
         return False
 
 
@@ -117,14 +114,15 @@ def traiter_fichier_xlsx(fichier: Path) -> bool:
         fichier: Chemin du fichier XLSX
 
     Returns:
-        True si traitement réussi
+        True si traitement reussi
     """
     try:
-        logger.info(f"📊 Traitement XLSX : {fichier.name}")
-        return traiter_fichier(fichier)
+        logger.info(f"Traitement XLSX : {fichier.name}")
+        resultat = traiter_fichier(fichier)
+        return resultat.get("statut") == "SUCCES"
 
-    except Exception as e:
-        logger.error(f"❌ Erreur traitement XLSX : {e}")
+    except Exception:
+        logger.exception(f"Erreur traitement XLSX : {fichier.name}")
         return False
 
 
@@ -136,14 +134,15 @@ def traiter_fichier_csv(fichier: Path) -> bool:
         fichier: Chemin du fichier CSV
 
     Returns:
-        True si traitement réussi
+        True si traitement reussi
     """
     try:
-        logger.info(f"📋 Traitement CSV : {fichier.name}")
-        return traiter_fichier(fichier)
+        logger.info(f"Traitement CSV : {fichier.name}")
+        resultat = traiter_fichier(fichier)
+        return resultat.get("statut") == "SUCCES"
 
-    except Exception as e:
-        logger.error(f"❌ Erreur traitement CSV : {e}")
+    except Exception:
+        logger.exception(f"Erreur traitement CSV : {fichier.name}")
         return False
 
 
@@ -155,7 +154,7 @@ def traiter_fichier_brut(fichier: Path) -> bool:
         fichier: Path du fichier
 
     Returns:
-        True si traitement réussi
+        True si traitement reussi
     """
     extension = fichier.suffix.lower()
 
@@ -166,7 +165,7 @@ def traiter_fichier_brut(fichier: Path) -> bool:
     elif extension == ".csv":
         return traiter_fichier_csv(fichier)
     else:
-        logger.warning(f"⚠️  Extension non reconnue : {extension} ({fichier.name})")
+        logger.warning(f"Extension non reconnue : {extension} ({fichier.name})")
         return False
 
 
@@ -179,103 +178,94 @@ def lancer_traitement():
     Lance le traitement batch de tous les fichiers bruts.
 
     Workflow :
-    1. Vérifier le lock file
-    2. Préparer environnement
+    1. Verifier le lock file
+    2. Preparer environnement
     3. Pour chaque fichier brut :
        - Traiter selon extension
        - Archiver fichier original
        - Supprimer fichiers temporaires
-    4. Afficher résumé
+    4. Afficher resume
     """
 
-    # 🔒 VERROUILLAGE
     if not verrouiller_traitement():
         return
 
-    succes = 0
+    succes  = 0
     erreurs = 0
-    ignorés = 0
+    ignores = 0
 
     try:
-        # 📦 PRÉPARATION
         logger.info("=" * 80)
-        logger.info("🚀 DÉBUT DU TRAITEMENT BATCH")
+        logger.info("DEBUT DU TRAITEMENT BATCH")
         logger.info("=" * 80)
 
         if not preparer_environnement():
-            logger.error("❌ Impossible de préparer l'environnement")
+            logger.error("Impossible de preparer l'environnement")
             return
 
-        # 📂 LISTAGE FICHIERS
         fichiers = lister_fichiers_bruts(DOSSIER_FICHIERS)
 
         if not fichiers:
-            logger.info("✅ Aucun fichier à traiter")
+            logger.info("Aucun fichier a traiter")
             return
 
-        logger.info(f"📊 {len(fichiers)} fichier(s) à traiter")
+        logger.info(f"{len(fichiers)} fichier(s) a traiter")
         logger.info("-" * 80)
 
-        # 🔁 TRAITEMENT
         for fichier in fichiers:
             try:
-                logger.info(f"\n📍 Traitement : {fichier.name}")
+                logger.info(f"Traitement : {fichier.name}")
 
-                # Vérifier que le fichier existe toujours
                 if not fichier.exists():
-                    logger.warning(f"⚠️  Fichier supprimé entre temps : {fichier.name}")
-                    ignorés += 1
+                    logger.warning(f"Fichier supprime entre temps : {fichier.name}")
+                    ignores += 1
                     continue
 
-                # 🔨 TRAITEMENT PRINCIPAL
                 traite = traiter_fichier_brut(fichier)
 
                 if traite:
                     succes += 1
 
-                    # 📦 ARCHIVAGE
                     if fichier.exists():
                         chemin_archive = archiver_fichier(
                             fichier,
                             ARCHIVE_BASE,
-                            creer_subdir_jour=True
+                            creer_subdir_jour=True,
                         )
 
                         if chemin_archive:
-                            logger.info(f"✅ Archivé : {Path(chemin_archive).name}")
+                            logger.info(f"Archive : {Path(chemin_archive).name}")
                         else:
-                            logger.error(f"❌ Erreur archivage : {fichier.name}")
+                            logger.error(f"Erreur archivage : {fichier.name}")
                             erreurs += 1
-                            succes -= 1
+                            succes  -= 1
                 else:
-                    logger.warning(f"⚠️  Fichier ignoré : {fichier.name}")
-                    ignorés += 1
+                    logger.warning(f"Fichier ignore : {fichier.name}")
+                    ignores += 1
 
-            except Exception as e:
+            except Exception:
                 erreurs += 1
-                logger.exception(f"❌ Erreur fatale sur {fichier.name}")
+                logger.exception(f"Erreur fatale sur {fichier.name}")
 
-        # 📊 RÉSUMÉ
-        logger.info("\n" + "=" * 80)
-        logger.info("📊 RÉSUMÉ DU TRAITEMENT")
         logger.info("=" * 80)
-        logger.info(f"✅ Traités avec succès   : {succes}")
-        logger.info(f"⚠️  Ignorés              : {ignorés}")
-        logger.info(f"❌ Erreurs              : {erreurs}")
-        logger.info(f"📊 Total                : {len(fichiers)}")
-        logger.info("=" * 80 + "\n")
+        logger.info("RESUME DU TRAITEMENT")
+        logger.info("=" * 80)
+        logger.info(f"Traites avec succes : {succes}")
+        logger.info(f"Ignores             : {ignores}")
+        logger.info(f"Erreurs             : {erreurs}")
+        logger.info(f"Total               : {len(fichiers)}")
+        logger.info("=" * 80)
 
-    except Exception as e:
-        logger.exception("❌ ERREUR CRITIQUE DANS LE TRAITEMENT")
+    except Exception:
+        logger.exception("ERREUR CRITIQUE DANS LE TRAITEMENT")
         erreurs += 1
 
     finally:
-        # 🔓 DÉVERROUILLAGE
         deverrouiller_traitement()
 
 
 # ============================================================================
-# POINT D'ENTRÉE
+# POINT D'ENTREE
 # ============================================================================
 
 if __name__ == "__main__":
