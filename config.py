@@ -6,9 +6,13 @@ import sys
 import logging
 from pathlib import Path
 import os
-from dotenv import load_dotenv  # type: ignore
 
-load_dotenv()
+# dotenv optionnel (absent dans le .exe)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LOGGER BOOTSTRAP
@@ -54,28 +58,22 @@ for _d in [DOSSIER_BRUT, DOSSIER_BACKUP, DOSSIER_SORTIE, DOSSIER_JUSTIFICATION, 
 
 LOG_FILE = BASE_DIR / "traitement.log"
 
-# Handler fichier
-file_handler = logging.FileHandler(
-    LOG_FILE,
-    encoding="utf-8"
-)
+file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(
-    logging.Formatter("%(asctime)s | %(levelname)s | %(message)s",
-                      datefmt="%d/%m/%Y %H:%M:%S")
+    logging.Formatter(
+        "%(asctime)s | %(levelname)s | %(message)s",
+        datefmt="%d/%m/%Y %H:%M:%S"
+    )
 )
 
-# Logger principal
 logger = logging.getLogger("compta")
 logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 
-# Ajouter aussi un handler console
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
-console_handler.setFormatter(
-    logging.Formatter("[%(levelname)s] %(message)s")
-)
+console_handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
 logger.addHandler(console_handler)
 
 _log.info(f"Logger fichier : {LOG_FILE}")
@@ -102,7 +100,7 @@ CAISSES_MOIS_FR = {
 def trouver_correspondance_amex() -> Path:
     """Cherche le fichier de correspondance AMEX."""
     _log.debug("Recherche fichier correspondance_amex...")
-    nom  = "correspondance_amex"
+    nom        = "correspondance_amex"
     extensions = [".csv", ".xlsx", ".xls"]
 
     for dossier in [BASE_DIR, DOSSIER_SORTIE]:
@@ -113,7 +111,7 @@ def trouver_correspondance_amex() -> Path:
                 return candidat
 
     fallback = DOSSIER_SORTIE / f"{nom}.csv"
-    _log.warning(f"Correspondance AMEX introuvable : {fallback}")
+    _log.warning(f"Correspondance AMEX introuvable → création : {fallback}")
     fallback.touch()
     return fallback
 
@@ -151,23 +149,26 @@ def chemin_saisie(fichier: str) -> Path:
 # CONFIGURATION POSTGRESQL
 # ══════════════════════════════════════════════════════════════════════════════
 
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 
 if not DB_PASSWORD:
-    _log.critical("❌ DB_PASSWORD non défini dans .env")
-    raise ValueError("DB_PASSWORD manquant")
+    _log.warning("⚠️ DB_PASSWORD non défini — fonctions base de données désactivées")
 
 DB_CONFIG = {
-    "host": "docker-01.pleney.local",
+    "host":     "docker-01.pleney.local",
     "database": "compta_app",
-    "user": "compta_app_admin",
+    "user":     "compta_app_admin",
     "password": DB_PASSWORD,
-    "port": 5432
+    "port":     5432,
 }
 
-POSTGRES_CONFIG = DB_CONFIG  # Alias pour rétro-compatibilité
+POSTGRES_CONFIG = DB_CONFIG  # Alias rétro-compatibilité
 
-_log.info(f"✓ PostgreSQL config chargée : {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}")
+if DB_PASSWORD:
+    _log.info(
+        f"✓ PostgreSQL config chargée : "
+        f"{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
+    )
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIN
